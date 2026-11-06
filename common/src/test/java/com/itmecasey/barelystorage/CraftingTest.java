@@ -37,11 +37,11 @@ class CraftingTest {
         final List<Pattern> started = new ArrayList<>();
         boolean accept = true;
 
-        public boolean start(Pattern pattern, int runs) {
+        public int start(Pattern pattern, int runs) {
             if (accept) {
                 started.add(pattern);
             }
-            return accept;
+            return accept ? runs : 0;
         }
 
         public void log(String line) {

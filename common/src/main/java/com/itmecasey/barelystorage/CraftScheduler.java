@@ -13,8 +13,8 @@ import java.util.Map;
 public final class CraftScheduler {
     /** What the scheduler needs from the world. */
     public interface Host {
-        /** Takes the inputs of {@code runs} runs out of the network and starts them; false (and nothing taken) when that cannot happen yet. */
-        boolean start(Pattern pattern, int runs);
+        /** Takes the inputs of up to {@code runs} runs out of the network and starts them; returns how many runs started (0 when none can yet). */
+        int start(Pattern pattern, int runs);
 
         /** An error or progress line for the rack's log. */
         void log(String line);
@@ -209,12 +209,13 @@ public final class CraftScheduler {
                 continue;
             }
             int batch = Math.min(s.pending, Math.max(1, Settings.getInt("crafting.max_batch")));
-            if (host.start(s.pattern, batch)) {
-                s.pending -= batch;
+            int started = Math.max(0, Math.min(batch, host.start(s.pattern, batch)));
+            if (started > 0) {
+                s.pending -= started;
                 if (s.active == 0) {
                     activeSteps++;
                 }
-                s.active += batch;
+                s.active += started;
             }
         }
     }
