@@ -34,7 +34,7 @@ Spend: none
 - [x] GUI frames seen on a client: all 22 tour frames on NeoForge 26.2, and tours passed on the other five layers (frames read: room overview and terminals) (w:4)
 
 ## Compatibility
-- [~] SMWTI plugin for rack, nodes and assembler (loaded from the Maven mirror; lines not yet viewed) (w:3)
+- [x] SMWTI plugin: Server Rack lines (energy, power, drives, CPU) seen on all six layers; Assembler and Interface Node lines seen on NeoForge 26.2 and 26.1.2; Storage Bus and Import Node lines not framed yet; no Jade plugin (w:3)
 - [~] JEI and REI plus buttons for the Crafting and Pattern terminals (NeoForge layers; plugins load, plus click not exercised) (w:4)
 - [x] BEI plus button (seen on NeoForge 26.2: enabled in the Pattern Terminal, fills the grid, hidden in the inventory; other layers compile only); search sync with BEI (seen on NeoForge 26.2 both ways), JEI and REI hooked (compile only); EMI (no build for 26.x) and Jade plugin still open (w:3)
 - [ ] Item viewers show items and recipes per version (checked loading only) (w:3)

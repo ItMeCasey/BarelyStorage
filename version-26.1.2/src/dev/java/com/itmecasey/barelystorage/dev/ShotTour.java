@@ -55,6 +55,7 @@ public final class ShotTour {
     private static final boolean PLAY = "play".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean BEI = "bei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean SEARCH = "search".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean LOOK = "look".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -222,6 +223,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (LOOK) {
+            lookSteps(y);
+            return;
+        }
         if (SEARCH) {
             searchSteps(y);
             return;
@@ -317,6 +322,27 @@ public final class ShotTour {
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
         then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    private static void lookAt(String name, Vec3 eye, Vec3 target) {
+        then(2, () -> moveTo(eye, target));
+        then(50, () -> LOGGER.info("BARELYSTORAGE-SHOTS look {} hit={}", name, Minecraft.getInstance().hitResult));
+        shoot("look_" + name, 2);
+    }
+
+    private static void lookSteps(int y) {
+        lookAt("rack", new Vec3(0.5, y + 1.0, -2.0), new Vec3(0.5, y + 0.5, 0.5));
+        lookAt("storage_bus", new Vec3(2.5, y + 2.0, -1.5), new Vec3(2.5, y + 1.5, 0.5));
+        lookAt("assembler", new Vec3(6.5, y + 1.2, -1.5), new Vec3(6.5, y + 0.5, 0.5));
+        lookAt("interface_node", new Vec3(9.5, y + 3.6, -1.5), new Vec3(9.5, y + 2.5, 0.5));
+        lookAt("import_node", new Vec3(9.5, y + 1.4, -1.5), new Vec3(9.5, y + 0.5, 0.5));
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
