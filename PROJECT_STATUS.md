@@ -36,7 +36,7 @@ Spend: none
 ## Compatibility
 - [~] SMWTI plugin for rack, nodes and assembler (loaded from the Maven mirror; lines not yet viewed) (w:3)
 - [~] JEI and REI plus buttons for the Crafting and Pattern terminals (NeoForge layers; plugins load, plus click not exercised) (w:4)
-- [ ] BEI plus button (BEI has no transfer API yet), EMI (no build for 26.x), Jade plugin (w:3)
+- [~] BEI plus button added (compiles on all six layers, not yet tried in a game); EMI (no build for 26.x) and Jade plugin still open (w:3)
 - [ ] Item viewers show items and recipes per version (checked loading only) (w:3)
 
 ## Docs, branding, release
