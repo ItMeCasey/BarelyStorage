@@ -68,6 +68,7 @@ public final class SelfTest {
             craftingAndHalt(new BlockPos(x, y + 6, z + 8));
             filtersAndUpgrades(new BlockPos(x, y + 12, z));
             terminalClicks(new BlockPos(x, y + 18, z));
+            efficiency(new BlockPos(x, y + 24, z));
         } catch (RuntimeException e) {
             LOGGER.error("SELFTEST error", e);
             verdict("selftest_ran_clean", false, e.toString());
@@ -305,6 +306,25 @@ public final class SelfTest {
         }
         verdict("taken_items_are_gone_from_the_cartridge_item_and_the_list", inItem == afterClick && shownNow == afterClick,
                 "item=" + inItem + " pool=" + afterClick + " listShows=" + shownNow);
+        clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+    }
+
+    private static void efficiency(BlockPos p) {
+        clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+        RackBlockEntity r = rack(p);
+        r.drives.setItem(0, cart("cartridge_gold"));
+        r.setEnergy(r.maxEnergy());
+        place(p.east(), "rack_bus_cable");
+        place(p.east(2), "assembler");
+        tick(r);
+        r.refreshEfficiency();
+        int before = r.upkeep();
+        AssemblerBlockEntity asm = (AssemblerBlockEntity) level.getBlockEntity(p.east(2));
+        asm.upgrades.setItem(0, new ItemStack(ModContent.item("upgrade_efficiency")));
+        asm.upgrades.setItem(1, new ItemStack(ModContent.item("upgrade_efficiency")));
+        r.refreshEfficiency();
+        int after = r.upkeep();
+        verdict("two_efficiency_cards_lower_the_rack_upkeep_by_a_fifth", after == before - before * 20 / 100 && after < before, "upkeep " + before + " -> " + after);
         clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
     }
 

@@ -111,6 +111,27 @@ public final class StorageNetwork implements CraftScheduler.Host {
         return java.util.Arrays.copyOf(out, n);
     }
 
+    /** Efficiency cards in every machine of the network; they lower each rack's upkeep. */
+    public int efficiencyCards() {
+        int n = 0;
+        for (var b : buses) {
+            n += b.efficiencyCards();
+        }
+        for (var b : interfaces) {
+            n += b.efficiencyCards();
+        }
+        for (var b : imports) {
+            n += b.efficiencyCards();
+        }
+        for (var b : exports) {
+            n += b.efficiencyCards();
+        }
+        for (var b : assemblers) {
+            n += b.efficiencyCards();
+        }
+        return n;
+    }
+
     public HolderLookup.Provider registries() {
         return level.registryAccess();
     }

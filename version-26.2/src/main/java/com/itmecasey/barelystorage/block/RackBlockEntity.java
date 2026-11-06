@@ -170,9 +170,18 @@ public class RackBlockEntity extends BlockEntity {
         return Hardware.of(basic, ram, quantum);
     }
 
+    private int efficiency;
+
+    /** Counts the Efficiency cards of the network again (done every second, and by tests). */
+    public void refreshEfficiency() {
+        if (level != null && !level.isClientSide()) {
+            efficiency = StorageNetwork.find(level, worldPosition).efficiencyCards();
+        }
+    }
+
     public int upkeep() {
         Hardware hw = hardware();
-        return PowerModel.perTick(cartridgeCount(), hw.basicCores(), hw.ramBlades(), hw.quantumCores());
+        return PowerModel.withEfficiency(PowerModel.perTick(cartridgeCount(), hw.basicCores(), hw.ramBlades(), hw.quantumCores()), efficiency);
     }
 
     void onDrivesChanged() {
@@ -188,6 +197,9 @@ public class RackBlockEntity extends BlockEntity {
 
     private void tick(Level level, BlockPos pos, BlockState state) {
         age++;
+        if (age % 20 == 1) {
+            refreshEfficiency();
+        }
         int paid = PowerModel.pay(energy, upkeep());
         boolean on = paid >= 0;
         if (on) {

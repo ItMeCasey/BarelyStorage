@@ -328,7 +328,7 @@ LANG = {
     "gui.barelystorage.result": "Result",
     "gui.barelystorage.blank": "Blank",
     "gui.barelystorage.encoded": "Encoded",
-    "smwti.barelystorage.rack_power": "Power: %s / %s FE (-%s FE/t)",
+    "smwti.barelystorage.rack_upkeep": "Upkeep: %s FE/t",
     "smwti.barelystorage.rack_drives": "Drives: %s used of %s, %s cartridges",
     "smwti.barelystorage.rack_cpu": "CPU: %s threads, %s RAM, depth %s",
     "smwti.barelystorage.rack_offline": "Offline: no power",

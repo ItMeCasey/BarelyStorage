@@ -22,7 +22,7 @@ Spend: none
 ## Machines and crafting
 - [x] Interface Node (patterns for its machine, buffer, upgrades) and Import and Export Nodes with filters (furnace and chest checked headless) (w:5)
 - [x] Assembler with patterns and upgrade slots (headless) (w:4)
-- [x] Upgrade cards: Speed, Capacity, Efficiency (rack upkeep), Filter (Efficiency effect not built yet, see docs) (w:3)
+- [x] Upgrade cards: Speed, Capacity, Efficiency (10% off every rack's upkeep per card in the network, max 50%, unit tests and self test), Filter (w:3)
 - [~] Crafting Terminal: grid from network and inventory, red missing ingredients (seen on NeoForge 26.2; craft click not exercised in a client) (w:4)
 - [~] Pattern Terminal: grid, processing outputs, Tags toggle, encode (seen on NeoForge 26.2; encode click not exercised in a client) (w:4)
 - [x] Crafting Queue Terminal with progress, halt error and cancel (seen on NeoForge 26.2) (w:3)
@@ -34,7 +34,7 @@ Spend: none
 - [x] GUI frames seen on a client: all 22 tour frames on NeoForge 26.2, and tours passed on the other five layers (frames read: room overview and terminals) (w:4)
 
 ## Compatibility
-- [x] SMWTI plugin: Server Rack lines (energy, power, drives, CPU) seen on all six layers; Assembler and Interface Node lines seen on NeoForge 26.2 and 26.1.2; Storage Bus and Import Node lines not framed yet; no Jade plugin (w:3)
+- [x] SMWTI plugin: Server Rack lines (energy, power, drives, CPU) seen on all six layers; Assembler, Interface Node, Storage Bus and Import Node lines seen on NeoForge 26.2 (rack line is Upkeep, no duplicate power bar); no Jade plugin (w:3)
 - [~] JEI and REI plus buttons for the Crafting and Pattern terminals (NeoForge layers; plugins load, plus click not exercised) (w:4)
 - [x] BEI plus button (seen on NeoForge 26.2: enabled in the Pattern Terminal, fills the grid, hidden in the inventory; other layers compile only); search sync with BEI (seen on NeoForge 26.2 both ways), JEI and REI hooked (compile only); EMI (no build for 26.x) and Jade plugin still open (w:3)
 - [ ] Item viewers show items and recipes per version (checked loading only) (w:3)

@@ -31,6 +31,8 @@ public final class Settings {
         def("power.base_per_tick", 8, "FE per tick a powered rack always uses.");
         def("power.per_cartridge", 2, "Extra FE per tick for each cartridge in a rack.");
         def("power.per_blade", 4, "Extra FE per tick for each blade in a rack (a Quantum Core costs three times this).");
+        def("power.efficiency_percent", 10, "Percent of a rack's upkeep each Efficiency card in the network takes off.");
+        def("power.efficiency_max_percent", 50, "Most upkeep, in percent, Efficiency cards can take off.");
 
         def("tier.iron.capacity", 8192, "Items an Iron Drive holds.");
         def("tier.steel.capacity", 65536, "Items a Steel Drive holds.");

@@ -30,8 +30,7 @@ public class BarelyStorageSmwtiPlugin implements ISmwtiPlugin {
                 if (!rack.online()) {
                     tooltip.add(Component.translatable("smwti.barelystorage.rack_offline"));
                 }
-                tooltip.bar(Component.translatable("smwti.barelystorage.rack_power", rack.energy(), rack.maxEnergy(), rack.upkeep()),
-                        (double) rack.energy() / Math.max(1, rack.maxEnergy()), GOLD);
+                tooltip.add(Component.translatable("smwti.barelystorage.rack_upkeep", rack.upkeep()));
                 tooltip.bar(Component.translatable("smwti.barelystorage.rack_drives", CartridgeItem.fmt(rack.used()), CartridgeItem.fmt(rack.capacity()),
                         rack.cartridgeCount()), (double) rack.used() / Math.max(1, rack.capacity()), BLUE);
                 StorageNetwork net = StorageNetwork.find(level, pos);

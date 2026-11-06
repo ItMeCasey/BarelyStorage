@@ -198,5 +198,10 @@ class StorageTest {
         assertEquals(100 - cost, PowerModel.pay(100, cost));
         assertEquals(-1, PowerModel.pay(cost - 1, cost));
         assertEquals(8 + 12, PowerModel.perTick(0, 0, 0, 1));
+        assertEquals(20, PowerModel.withEfficiency(20, 0));
+        assertEquals(16, PowerModel.withEfficiency(20, 2));
+        assertEquals(10, PowerModel.withEfficiency(20, 5));
+        assertEquals(10, PowerModel.withEfficiency(20, 12), "the cap is 50 percent");
+        assertEquals(1, PowerModel.withEfficiency(1, 5), "a rack always pays at least 1");
     }
 }

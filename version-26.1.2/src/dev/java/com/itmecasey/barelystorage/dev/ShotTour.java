@@ -368,12 +368,30 @@ public final class ShotTour {
         shoot("look_" + name, 2);
     }
 
+    /** Switches the SMWTI overlay on for this run only, in memory (the dev folder's config file keeps its own setting). */
+    private static void smwtiOn() {
+        try {
+            var f = Class.forName("com.itmecasey.smwti.SmwtiConfig").getDeclaredField("ENABLED");
+            f.setAccessible(true);
+            Object value = f.get(null);
+            for (var m : value.getClass().getMethods()) {
+                if (m.getName().equals("set") && m.getParameterCount() == 1) {
+                    m.invoke(value, true);
+                    break;
+                }
+            }
+            LOGGER.info("BARELYSTORAGE-SHOTS smwti overlay on for this run");
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
+            LOGGER.warn("BARELYSTORAGE-SHOTS could not switch the SMWTI overlay on: {}", e.toString());
+        }
+    }
+
     private static void lookSteps(int y) {
-        lookAt("rack", new Vec3(0.5, y + 1.0, -2.0), new Vec3(0.5, y + 0.5, 0.5));
-        lookAt("storage_bus", new Vec3(2.5, y + 2.0, -1.5), new Vec3(2.5, y + 1.5, 0.5));
-        lookAt("assembler", new Vec3(6.5, y + 1.2, -1.5), new Vec3(6.5, y + 0.5, 0.5));
-        lookAt("interface_node", new Vec3(9.5, y + 3.6, -1.5), new Vec3(9.5, y + 2.5, 0.5));
-        lookAt("import_node", new Vec3(9.5, y + 1.4, -1.5), new Vec3(9.5, y + 0.5, 0.5));
+        then(2, ShotTour::smwtiOn);
+        lookAt("storage_bus_north", new Vec3(2.8, y + 1.5, -1.2), new Vec3(2.8, y + 1.5, 0.5));
+        lookAt("storage_bus_high", new Vec3(2.8, y + 1.85, -1.2), new Vec3(2.8, y + 1.85, 0.5));
+        lookAt("import_node_east", new Vec3(11.0, y + 0.85, 0.5), new Vec3(9.5, y + 0.85, 0.5));
+        lookAt("import_node_north", new Vec3(9.5, y + 0.8, -1.2), new Vec3(9.5, y + 0.8, 0.5));
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
