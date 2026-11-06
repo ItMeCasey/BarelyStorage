@@ -1,0 +1,7 @@
+{
+  "providers": [
+    { "type": "reference", "id": "minecraft:include/space" },
+    { "type": "ttf", "file": "barelystorage:liberation_sans.ttf", "size": 7.0, "oversample": 8.0, "shift": [0.0, 0.0] },
+    { "type": "reference", "id": "minecraft:default" }
+  ]
+}

@@ -214,12 +214,13 @@ def assembler_top():
 
 
 def cable_tex():
-    im = brushed(16, 16, METAL_D, 21, 4)
+    """A slim gunmetal cable with one thin cyan data line (row 7) and a light top edge."""
+    im = brushed(16, 16, METAL_D, 21, 3)
     d = ImageDraw.Draw(im)
-    d.line([(0, 7), (15, 7)], fill=GOLD_D + (255,))
-    d.line([(0, 8), (15, 8)], fill=GOLD + (255,))
-    for x in range(1, 16, 5):
-        d.line([(x, 0), (x, 15)], fill=NIGHT + (255,))
+    d.line([(0, 0), (15, 0)], fill=METAL_L + (255,))
+    d.line([(0, 15), (15, 15)], fill=NIGHT + (255,))
+    d.line([(0, 7), (15, 7)], fill=mix(CYAN, NIGHT, 0.25) + (255,))
+    d.line([(0, 8), (15, 8)], fill=mix(BLUE, NIGHT, 0.6) + (255,))
     return im
 
 

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -19,11 +20,11 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     private Button amountButton;
 
     public TerminalScreen(TerminalMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, 176, 230);
+        super(menu, inventory, title, 176, 234);
         this.titleLabelX = 8;
         this.titleLabelY = 5;
         this.inventoryLabelX = 8;
-        this.inventoryLabelY = 137;
+        this.inventoryLabelY = 142;
     }
 
     @Override
@@ -31,14 +32,15 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         super.init();
         search = new EditBox(font, leftPos + 9, topPos + 17, 96, 12, Component.translatable("gui.barelystorage.search"));
         search.setMaxLength(40);
+        search.addFormatter((text, offset) -> FormattedCharSequence.forward(text, Ui.STYLE));
         search.setResponder(this::searchChanged);
         search.setFocused(true);
         addRenderableWidget(search);
         setInitialFocus(search);
-        sortButton = addRenderableWidget(Button.builder(Component.literal("A-Z"), b -> press(TerminalMenu.BTN_SORT)).bounds(leftPos + 110, topPos + 15, 28, 16).build());
-        amountButton = addRenderableWidget(Button.builder(Component.literal("x1"), b -> press(TerminalMenu.BTN_AMOUNT)).bounds(leftPos + 140, topPos + 15, 28, 16).build());
-        addRenderableWidget(Button.builder(Component.literal("<"), b -> press(TerminalMenu.BTN_PREV)).bounds(leftPos + 8, topPos + 128, 18, 12).build());
-        addRenderableWidget(Button.builder(Component.literal(">"), b -> press(TerminalMenu.BTN_NEXT)).bounds(leftPos + 150, topPos + 128, 18, 12).build());
+        sortButton = addRenderableWidget(Button.builder(Ui.t("A-Z"), b -> press(TerminalMenu.BTN_SORT)).bounds(leftPos + 110, topPos + 15, 28, 16).build());
+        amountButton = addRenderableWidget(Button.builder(Ui.t("x1"), b -> press(TerminalMenu.BTN_AMOUNT)).bounds(leftPos + 140, topPos + 15, 28, 16).build());
+        addRenderableWidget(Button.builder(Ui.t("<"), b -> press(TerminalMenu.BTN_PREV)).bounds(leftPos + 8, topPos + 128, 18, 12).build());
+        addRenderableWidget(Button.builder(Ui.t(">"), b -> press(TerminalMenu.BTN_NEXT)).bounds(leftPos + 150, topPos + 128, 18, 12).build());
     }
 
     private void press(int id) {
@@ -71,22 +73,24 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         super.extractBackground(g, mouseX, mouseY, a);
         Ui.panel(g, leftPos, topPos, imageWidth, imageHeight);
         Ui.slots(g, menu.slots, leftPos, topPos);
-        sortButton.setMessage(Component.literal(menu.data(TerminalMenu.D_SORT) == 0 ? "A-Z" : "123"));
-        amountButton.setMessage(Component.literal("x" + TerminalMenu.AMOUNTS[Math.min(2, menu.data(TerminalMenu.D_AMOUNT))]));
+        sortButton.setMessage(Ui.t(menu.data(TerminalMenu.D_SORT) == 0 ? "A-Z" : "123"));
+        amountButton.setMessage(Ui.t("x" + TerminalMenu.AMOUNTS[Math.min(2, menu.data(TerminalMenu.D_AMOUNT))]));
         boolean online = menu.data(TerminalMenu.D_ONLINE) != 0;
         g.fill(leftPos + 158, topPos + 5, leftPos + 168, topPos + 9, online ? Ui.GREEN : Ui.RED);
         int page = menu.data(TerminalMenu.D_PAGE) + 1;
         int max = menu.data(TerminalMenu.D_MAXPAGE) + 1;
-        g.centeredText(font, Component.translatable("gui.barelystorage.page", page, max), leftPos + 88, topPos + 130, Ui.MUTED);
+        Component pageText = Ui.t(Component.translatable("gui.barelystorage.page", page, max));
+        g.text(font, pageText, leftPos + 88 - font.width(pageText) / 2, topPos + 130, Ui.MUTED, false);
         if (!online) {
-            g.centeredText(font, Component.translatable("gui.barelystorage.offline"), leftPos + 88, topPos + 80, Ui.RED);
+            Component off = Ui.t(Component.translatable("gui.barelystorage.offline"));
+            g.text(font, off, leftPos + 88 - font.width(off) / 2, topPos + 78, Ui.RED, false);
         }
     }
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        g.text(font, title, titleLabelX, titleLabelY, Ui.GOLD, false);
-        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED, false);
+        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.GOLD);
+        Ui.text(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
     }
 
     @Override
@@ -103,10 +107,12 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
             }
             String text = craftable ? "C" : stack.getCount() > 1 ? CartridgeItem.fmt(stack.getCount()) : "";
             if (!text.isEmpty()) {
+                Component c = Ui.t(text);
+                g.nextStratum();
                 g.pose().pushMatrix();
-                g.pose().translate(slot.x + 17 - font.width(text) * 0.6F, slot.y + 10);
-                g.pose().scale(0.6F, 0.6F);
-                g.text(font, text, 0, 0, craftable ? Ui.GOLD : Ui.TEXT, true);
+                g.pose().translate(slot.x + 17 - font.width(c) * 0.75F, slot.y + 9);
+                g.pose().scale(0.75F, 0.75F);
+                g.text(font, c, 0, 0, craftable ? Ui.GOLD : Ui.TEXT, true);
                 g.pose().popMatrix();
             }
             return;

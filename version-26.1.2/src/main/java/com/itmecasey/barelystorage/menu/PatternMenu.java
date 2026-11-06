@@ -71,9 +71,9 @@ public class PatternMenu extends StorageMenu {
             }
         }
         for (int i = 0; i < OUTS; i++) {
-            addSlot(new GhostSlot(ghost, GRID + i, 124, 24 + i * 18));
+            addSlot(new GhostSlot(ghost, GRID + i, 96, 24 + i * 18));
         }
-        addSlot(new Slot(result, 0, 124, 78) {
+        addSlot(new Slot(result, 0, 140, 42) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -84,19 +84,19 @@ public class PatternMenu extends StorageMenu {
                 return false;
             }
         });
-        addSlot(new Slot(blank, 0, 30, 84) {
+        addSlot(new Slot(blank, 0, 30, 90) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return container.canPlaceItem(0, stack);
             }
         });
-        addSlot(new Slot(encoded, 0, 84, 84) {
+        addSlot(new Slot(encoded, 0, 84, 90) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
             }
         });
-        playerSlots(inventory, 8, 120 + 6);
+        playerSlots(inventory, 8, 134);
         addDataSlots(data);
     }
 

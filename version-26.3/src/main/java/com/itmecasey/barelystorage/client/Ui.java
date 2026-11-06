@@ -1,10 +1,20 @@
 package com.itmecasey.barelystorage.client;
 
+import com.itmecasey.barelystorage.ModContent;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.Slot;
 
-/** Flat dark server-room styling drawn with plain fills, so the screens need no texture files. */
+/**
+ * Flat dark server-room styling drawn with plain fills, so the screens need no texture files, and the mod's text font: Liberation
+ * Sans (SIL Open Font License) as a TrueType font, so text stays sharp and readable at small sizes and when scaled.
+ */
 final class Ui {
+    static final FontDescription FONT = new FontDescription.Resource(ModContent.id("ui"));
+    static final Style STYLE = Style.EMPTY.withFont(FONT);
     static final int NIGHT = 0xFF0F0E1A;
     static final int PANEL = 0xFF1A1830;
     static final int EDGE = 0xFF2E2A46;
@@ -18,6 +28,23 @@ final class Ui {
     static final int SLOT = 0xFF0B0A14;
 
     private Ui() {
+    }
+
+    /** The component in the mod font. */
+    static Component t(Component c) {
+        return c.copy().withStyle(STYLE);
+    }
+
+    static Component t(String s) {
+        return Component.literal(s).withStyle(STYLE);
+    }
+
+    static void text(GuiGraphicsExtractor g, Font font, Component c, int x, int y, int color) {
+        g.text(font, t(c), x, y, color, false);
+    }
+
+    static void text(GuiGraphicsExtractor g, Font font, String s, int x, int y, int color) {
+        g.text(font, t(s), x, y, color, false);
     }
 
     static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {

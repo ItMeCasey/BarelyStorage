@@ -44,6 +44,33 @@ public final class CraftPlanner {
         return p.plan;
     }
 
+    /** Picks which of an input's acceptable items to plan with: the first one the stock covers, else the best stocked, else one that can be crafted. */
+    private ItemKey choose(Pattern.Stack in, long amount) {
+        if (in.alts().isEmpty()) {
+            return in.key();
+        }
+        ItemKey best = in.key();
+        long bestStock = -1;
+        for (ItemKey c : in.candidates()) {
+            long have = stock.getOrDefault(c, 0L);
+            if (have >= amount) {
+                return c;
+            }
+            if (have > bestStock) {
+                best = c;
+                bestStock = have;
+            }
+        }
+        if (bestStock <= 0) {
+            for (ItemKey c : in.candidates()) {
+                if (firstPattern(c) != null) {
+                    return c;
+                }
+            }
+        }
+        return best;
+    }
+
     private Pattern firstPattern(ItemKey key) {
         for (Pattern pt : patterns) {
             if (pt.makes(key)) {
@@ -97,7 +124,7 @@ public final class CraftPlanner {
         int childMax = 0;
         Set<Integer> deps = new java.util.TreeSet<>();
         for (Pattern.Stack in : pattern.inputs()) {
-            int h = need(in.key(), in.count() * runs, chain, false, deps);
+            int h = need(choose(in, in.count() * runs), in.count() * runs, chain, false, deps);
             childMax = Math.max(childMax, h);
             if (plan.error != CraftPlan.Error.NONE) {
                 chain.remove(chain.size() - 1);

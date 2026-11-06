@@ -100,7 +100,7 @@ public class TerminalMenu extends StorageMenu {
                 });
             }
         }
-        playerSlots(inventory, 8, 148);
+        playerSlots(inventory, 8, 152);
         addDataSlots(data);
     }
 

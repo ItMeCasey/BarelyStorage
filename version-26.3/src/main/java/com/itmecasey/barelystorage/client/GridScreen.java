@@ -25,7 +25,7 @@ public class GridScreen extends AbstractContainerScreen<GridMenu> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        g.text(font, title, titleLabelX, titleLabelY, Ui.GOLD, false);
-        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED, false);
+        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.GOLD);
+        Ui.text(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
     }
 }

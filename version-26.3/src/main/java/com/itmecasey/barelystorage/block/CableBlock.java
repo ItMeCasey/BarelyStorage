@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class CableBlock extends Block implements NetNode {
     private static final Map<Direction, BooleanProperty> PROPERTIES = new EnumMap<>(Direction.class);
     private static final Map<Direction, VoxelShape> ARMS = new EnumMap<>(Direction.class);
-    private static final VoxelShape CORE = Block.box(5, 5, 5, 11, 11, 11);
+    private static final VoxelShape CORE = Block.box(6, 6, 6, 10, 10, 10);
     private static final VoxelShape[] SHAPES = new VoxelShape[64];
 
     static {
@@ -36,12 +36,12 @@ public class CableBlock extends Block implements NetNode {
         PROPERTIES.put(Direction.SOUTH, BlockStateProperties.SOUTH);
         PROPERTIES.put(Direction.WEST, BlockStateProperties.WEST);
         PROPERTIES.put(Direction.EAST, BlockStateProperties.EAST);
-        ARMS.put(Direction.DOWN, Block.box(5, 0, 5, 11, 5, 11));
-        ARMS.put(Direction.UP, Block.box(5, 11, 5, 11, 16, 11));
-        ARMS.put(Direction.NORTH, Block.box(5, 5, 0, 11, 11, 5));
-        ARMS.put(Direction.SOUTH, Block.box(5, 5, 11, 11, 11, 16));
-        ARMS.put(Direction.WEST, Block.box(0, 5, 5, 5, 11, 11));
-        ARMS.put(Direction.EAST, Block.box(11, 5, 5, 16, 11, 11));
+        ARMS.put(Direction.DOWN, Block.box(6, 0, 6, 10, 6, 10));
+        ARMS.put(Direction.UP, Block.box(6, 10, 6, 10, 16, 10));
+        ARMS.put(Direction.NORTH, Block.box(6, 6, 0, 10, 10, 6));
+        ARMS.put(Direction.SOUTH, Block.box(6, 6, 10, 10, 10, 16));
+        ARMS.put(Direction.WEST, Block.box(0, 6, 6, 6, 10, 10));
+        ARMS.put(Direction.EAST, Block.box(10, 6, 6, 16, 10, 10));
         for (int mask = 0; mask < 64; mask++) {
             VoxelShape shape = CORE;
             for (Direction d : Direction.values()) {

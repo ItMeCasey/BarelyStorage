@@ -1,10 +1,11 @@
 {
   "textures": {
-    "0": "barelystorage:block/interface_node",
+    "6": "barelystorage:block/interface_node",
     "particle": "barelystorage:block/interface_node"
   },
   "elements": [
     {
+      "name": "plate",
       "from": [
         2,
         2,
@@ -13,74 +14,144 @@
       "to": [
         14,
         14,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#6"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            12
+          ],
+          "texture": "#6"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#6"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            12
+          ],
+          "texture": "#6"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            12,
+            2
+          ],
+          "texture": "#6"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            12,
+            2
+          ],
+          "texture": "#6"
+        }
+      }
+    },
+    {
+      "name": "ring",
+      "from": [
+        3,
+        3,
+        2
+      ],
+      "to": [
+        13,
+        13,
         3
       ],
       "faces": {
         "north": {
           "uv": [
-            2,
-            2,
-            14,
-            14
+            3,
+            3,
+            13,
+            13
           ],
-          "texture": "#0"
-        },
-        "south": {
-          "uv": [
-            2,
-            2,
-            14,
-            14
-          ],
-          "texture": "#0"
+          "texture": "#6"
         },
         "east": {
           "uv": [
-            2,
             0,
-            14,
-            3
+            0,
+            1,
+            10
           ],
-          "texture": "#0"
+          "texture": "#6"
+        },
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#6"
         },
         "west": {
           "uv": [
-            2,
             0,
-            14,
-            3
+            0,
+            1,
+            10
           ],
-          "texture": "#0"
+          "texture": "#6"
         },
         "up": {
           "uv": [
-            2,
             0,
-            14,
-            3
+            0,
+            10,
+            1
           ],
-          "texture": "#0"
+          "texture": "#6"
         },
         "down": {
           "uv": [
-            2,
             0,
-            14,
-            3
+            0,
+            10,
+            1
           ],
-          "texture": "#0"
+          "texture": "#6"
         }
       }
     },
     {
+      "name": "stud",
       "from": [
-        5,
-        5,
+        5.5,
+        5.5,
         3
       ],
       "to": [
-        11,
-        11,
+        10.5,
+        10.5,
         5
       ],
       "faces": {
@@ -91,7 +162,16 @@
             11,
             11
           ],
-          "texture": "#0"
+          "texture": "#6"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#6"
         },
         "south": {
           "uv": [
@@ -100,43 +180,103 @@
             11,
             11
           ],
-          "texture": "#0"
-        },
-        "east": {
-          "uv": [
-            5,
-            5,
-            11,
-            11
-          ],
-          "texture": "#0"
+          "texture": "#6"
         },
         "west": {
           "uv": [
-            5,
-            5,
-            11,
-            11
+            0,
+            0,
+            2,
+            5
           ],
-          "texture": "#0"
+          "texture": "#6"
         },
         "up": {
           "uv": [
+            0,
+            0,
             5,
-            5,
-            11,
-            11
+            2
           ],
-          "texture": "#0"
+          "texture": "#6"
         },
         "down": {
           "uv": [
+            0,
+            0,
             5,
-            5,
-            11,
-            11
+            2
           ],
-          "texture": "#0"
+          "texture": "#6"
+        }
+      }
+    },
+    {
+      "name": "tab",
+      "from": [
+        6.5,
+        6.5,
+        5
+      ],
+      "to": [
+        9.5,
+        9.5,
+        5.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#6"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1,
+            3
+          ],
+          "texture": "#6"
+        },
+        "south": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#6"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1,
+            3
+          ],
+          "texture": "#6"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3,
+            1
+          ],
+          "texture": "#6"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            3,
+            1
+          ],
+          "texture": "#6"
         }
       }
     }

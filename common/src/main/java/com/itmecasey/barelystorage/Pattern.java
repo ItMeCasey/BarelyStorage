@@ -7,7 +7,26 @@ import java.util.List;
 public record Pattern(Kind kind, List<Stack> inputs, List<Stack> outputs) {
     public enum Kind { CRAFTING, PROCESSING }
 
-    public record Stack(ItemKey key, int count) {
+    /** One ingredient or product. {@code alts} are other items that may stand in for {@code key} (items sharing a tag with it). */
+    public record Stack(ItemKey key, int count, List<ItemKey> alts) {
+        public Stack {
+            alts = List.copyOf(alts);
+        }
+
+        public Stack(ItemKey key, int count) {
+            this(key, count, List.of());
+        }
+
+        /** The item itself first, then its stand-ins. */
+        public List<ItemKey> candidates() {
+            if (alts.isEmpty()) {
+                return List.of(key);
+            }
+            List<ItemKey> all = new ArrayList<>(alts.size() + 1);
+            all.add(key);
+            all.addAll(alts);
+            return all;
+        }
     }
 
     public Pattern {
@@ -41,6 +60,9 @@ public record Pattern(Kind kind, List<Stack> inputs, List<Stack> outputs) {
                 sb.append('\u001d');
             }
             sb.append(s.count()).append('*').append(s.key().encode());
+            for (ItemKey alt : s.alts()) {
+                sb.append('').append(alt.encode());
+            }
         }
         return sb.toString();
     }
@@ -57,7 +79,12 @@ public record Pattern(Kind kind, List<Stack> inputs, List<Stack> outputs) {
         }
         for (String part : text.split("\u001d")) {
             int star = part.indexOf('*');
-            out.add(new Stack(ItemKey.decode(part.substring(star + 1)), Integer.parseInt(part.substring(0, star))));
+            String[] keys = part.substring(star + 1).split("");
+            List<ItemKey> alts = new ArrayList<>();
+            for (int i = 1; i < keys.length; i++) {
+                alts.add(ItemKey.decode(keys[i]));
+            }
+            out.add(new Stack(ItemKey.decode(keys[0]), Integer.parseInt(part.substring(0, star)), alts));
         }
         return out;
     }

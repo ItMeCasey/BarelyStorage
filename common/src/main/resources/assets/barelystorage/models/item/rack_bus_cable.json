@@ -1,74 +1,75 @@
 {
   "textures": {
-    "0": "barelystorage:block/rack_bus_cable",
+    "4": "barelystorage:block/rack_bus_cable",
     "particle": "barelystorage:block/rack_bus_cable"
   },
   "elements": [
     {
+      "name": "straight",
       "from": [
         0,
-        6,
-        5
+        6.5,
+        6.5
       ],
       "to": [
         16,
-        10,
-        11
+        9.5,
+        9.5
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            5,
-            16,
-            11
+            6.5,
+            6.5,
+            9.5,
+            9.5
           ],
-          "texture": "#0"
-        },
-        "south": {
-          "uv": [
-            0,
-            5,
-            16,
-            11
-          ],
-          "texture": "#0"
+          "texture": "#4"
         },
         "east": {
           "uv": [
             0,
-            5,
+            6.5,
             16,
-            11
+            9.5
           ],
-          "texture": "#0"
+          "texture": "#4"
+        },
+        "south": {
+          "uv": [
+            6.5,
+            6.5,
+            9.5,
+            9.5
+          ],
+          "texture": "#4"
         },
         "west": {
           "uv": [
             0,
-            5,
+            6.5,
             16,
-            11
+            9.5
           ],
-          "texture": "#0"
+          "texture": "#4"
         },
         "up": {
           "uv": [
             0,
-            5,
+            6.5,
             16,
-            11
+            9.5
           ],
-          "texture": "#0"
+          "texture": "#4"
         },
         "down": {
           "uv": [
             0,
-            5,
+            6.5,
             16,
-            11
+            9.5
           ],
-          "texture": "#0"
+          "texture": "#4"
         }
       }
     }

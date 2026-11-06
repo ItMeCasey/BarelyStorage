@@ -31,7 +31,7 @@ public class RackBlockEntity extends BlockEntity {
     public static final int DRIVES = 8;
     public static final int BLADES = 4;
     /** Number of values the rack menu receives. */
-    public static final int STATS = 20;
+    public static final int STATS = 22;
 
     public final Drives drives = new Drives(this);
     public final SimpleContainer blades = new SimpleContainer(BLADES) {
@@ -237,6 +237,7 @@ public class RackBlockEntity extends BlockEntity {
             stats[19] = head.steps.size();
             stats[14] = head.plan.parallelism;
             stats[15] = Math.min(head.plan.ram, 32767);
+            stats[20] = Math.min(head.plan.depth, 99);
             if (head.state == CraftScheduler.State.HALTED) {
                 CraftPlan.Error e = head.plan.error;
                 stats[13] = e == CraftPlan.Error.NO_CORE ? 1 : e == CraftPlan.Error.THREAD_EXHAUSTION ? 2 : e == CraftPlan.Error.OUT_OF_MEMORY ? 3 : 4;

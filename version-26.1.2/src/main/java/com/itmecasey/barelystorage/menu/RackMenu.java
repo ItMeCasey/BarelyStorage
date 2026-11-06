@@ -17,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 /** The Server Rack screen: drive bays, blade slots and a live readout of power, storage, CPU, RAM and errors. */
 public class RackMenu extends StorageMenu {
     public static final int DRIVE_X = 8;
-    public static final int DRIVE_Y = 22;
+    public static final int DRIVE_Y = 26;
     public static final int BLADE_X = 8;
-    public static final int BLADE_Y = 52;
+    public static final int BLADE_Y = 56;
     private final Container drives;
     private final Container blades;
     private final ContainerData data;
@@ -63,7 +63,7 @@ public class RackMenu extends StorageMenu {
                 }
             });
         }
-        playerSlots(inventory, 8, 130);
+        playerSlots(inventory, 8, 162);
         addDataSlots(data);
     }
 

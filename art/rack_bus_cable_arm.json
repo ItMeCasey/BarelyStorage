@@ -1,0 +1,22 @@
+{
+	"format_version": "26.3",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"4": "rack_bus_cable"
+	},
+	"elements": [
+		{
+			"name": "arm",
+			"from": [6.5, 6.5, 0],
+			"to": [9.5, 9.5, 6.5],
+			"faces": {
+				"north": {"uv": [6.5, 6.5, 9.5, 9.5], "texture": "#4"},
+				"east": {"uv": [0, 6.5, 6.5, 9.5], "texture": "#4"},
+				"south": {"uv": [6.5, 6.5, 9.5, 9.5], "texture": "#4"},
+				"west": {"uv": [0, 6.5, 6.5, 9.5], "texture": "#4"},
+				"up": {"uv": [0, 6.5, 6.5, 9.5], "texture": "#4"},
+				"down": {"uv": [0, 6.5, 6.5, 9.5], "texture": "#4"}
+			}
+		}
+	]
+}

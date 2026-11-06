@@ -290,4 +290,26 @@ class CraftingTest {
         assertTrue(s.submit(PICK, 1, stock(PLANKS, 9, STICK, 9), all, host).ok());
         assertFalse(s.submit(PICK, 1, stock(PLANKS, 9, STICK, 9), all, host).ok());
     }
+
+    @Test
+    void tagSubstitutesUseWhatIsInStock() {
+        ItemKey birch = ItemKey.of("minecraft:birch_planks");
+        Pattern sticksFromAnyPlanks = new Pattern(Pattern.Kind.CRAFTING,
+                List.of(new Pattern.Stack(PLANKS, 2, List.of(birch))), List.of(new Pattern.Stack(STICK, 4)));
+        CraftPlan plan = CraftPlanner.plan(STICK, 4, stock(birch, 10), List.of(sticksFromAnyPlanks));
+        assertTrue(plan.ok(), plan.message);
+        assertEquals(1, plan.steps.size());
+        assertEquals(2L, plan.fromStock.get(birch));
+        CraftPlan strict = CraftPlanner.plan(STICK, 4, stock(birch, 10),
+                List.of(new Pattern(Pattern.Kind.CRAFTING, List.of(new Pattern.Stack(PLANKS, 2)), List.of(new Pattern.Stack(STICK, 4)))));
+        assertEquals(CraftPlan.Error.MISSING, strict.error);
+    }
+
+    @Test
+    void substitutesSurviveEncoding() {
+        Pattern p = new Pattern(Pattern.Kind.CRAFTING,
+                List.of(new Pattern.Stack(PLANKS, 3, List.of(ItemKey.of("minecraft:birch_planks"), ItemKey.of("minecraft:oak_planks"))), new Pattern.Stack(STICK, 2)),
+                List.of(new Pattern.Stack(PICK, 1)));
+        assertEquals(p, Pattern.decode(p.encode()));
+    }
 }
