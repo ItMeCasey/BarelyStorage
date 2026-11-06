@@ -2,7 +2,7 @@ package com.itmecasey.barelystorage.block;
 
 import com.itmecasey.barelystorage.NetNode;
 import com.itmecasey.barelystorage.StorageNetwork;
-import com.itmecasey.barelystorage.menu.PatternMenu;
+import com.itmecasey.barelystorage.menu.TerminalMenu;
 import com.itmecasey.barelystorage.menu.TerminalMenus;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 /** The Storage Terminal and the Pattern Terminal: screens onto the network. */
 public class TerminalBlock extends Block implements NetNode {
-    public enum Kind { STORAGE, PATTERN }
+    public enum Kind { STORAGE, CRAFTING, PATTERN, QUEUE }
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final MapCodec<TerminalBlock> CODEC = simpleCodec(p -> new TerminalBlock(Kind.STORAGE, p));
@@ -75,14 +75,12 @@ public class TerminalBlock extends Block implements NetNode {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide()) {
-            if (kind == Kind.STORAGE) {
-                if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
-                    TerminalMenus.open(sp, level, pos);
-                }
-            } else {
-                player.openMenu(new SimpleMenuProvider((id, inv, p) -> new PatternMenu(id, inv, level, pos),
-                        Component.translatable("block.barelystorage.pattern_terminal")));
+        if (!level.isClientSide() && player instanceof net.minecraft.server.level.ServerPlayer sp) {
+            switch (kind) {
+                case STORAGE -> TerminalMenus.open(sp, level, pos, TerminalMenu.Kind.STORAGE);
+                case CRAFTING -> TerminalMenus.open(sp, level, pos, TerminalMenu.Kind.CRAFTING);
+                case PATTERN -> TerminalMenus.open(sp, level, pos, TerminalMenu.Kind.PATTERN);
+                case QUEUE -> TerminalMenus.openQueue(sp, level, pos);
             }
         }
         return InteractionResult.SUCCESS;

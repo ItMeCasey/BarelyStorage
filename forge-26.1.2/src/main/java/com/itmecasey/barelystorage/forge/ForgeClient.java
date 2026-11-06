@@ -2,7 +2,7 @@ package com.itmecasey.barelystorage.forge;
 
 import com.itmecasey.barelystorage.ModContent;
 import com.itmecasey.barelystorage.client.NodeScreen;
-import com.itmecasey.barelystorage.client.PatternScreen;
+import com.itmecasey.barelystorage.client.QueueScreen;
 import com.itmecasey.barelystorage.client.RackScreen;
 import com.itmecasey.barelystorage.client.TerminalScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -24,7 +24,7 @@ final class ForgeClient {
             for (var type : ModContent.terminalMenus()) {
                 MenuScreens.register(type, TerminalScreen::new);
             }
-            MenuScreens.register(ModContent.PATTERN_MENU, PatternScreen::new);
+            MenuScreens.register(ModContent.QUEUE_MENU, QueueScreen::new);
             MenuScreens.register(ModContent.INTERFACE_MENU, NodeScreen::new);
             MenuScreens.register(ModContent.ASSEMBLER_MENU, NodeScreen::new);
             MenuScreens.register(ModContent.BUS_MENU, NodeScreen::new);

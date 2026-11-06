@@ -8,6 +8,8 @@
     "barelystorage:import_node",
     "barelystorage:export_node",
     "barelystorage:storage_terminal",
+    "barelystorage:crafting_terminal",
+    "barelystorage:queue_terminal",
     "barelystorage:pattern_terminal",
     "barelystorage:assembler"
   ]

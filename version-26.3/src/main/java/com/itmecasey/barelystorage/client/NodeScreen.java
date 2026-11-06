@@ -37,6 +37,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         super.extractBackground(g, mouseX, mouseY, a);
         Ui.panel(g, leftPos, topPos, imageWidth, imageHeight);
+        Ui.panel(g, leftPos + menu.upgradeX - 5, topPos + menu.upgradeY - 15, 46, NodeMenu.UPGRADES * 18 + 21);
         int start = menu.areaStart();
         int end = start + 45;
         for (Slot s : menu.slots) {

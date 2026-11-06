@@ -141,6 +141,22 @@ def terminal_front(kind):
                 d.rectangle([x, y, x + 1, y + 2], fill=mix(BLUE, NIGHT, 0.55 + 0.1 * ((r + c) % 3)) + (255,))
         d.line([(5, 21), (26, 21)], fill=CYAN + (255,))
         d.rectangle([5, 5, 11, 5], fill=CYAN + (255,))
+    elif kind == "crafting":
+        for r in range(3):
+            for c in range(3):
+                x = 6 + c * 4
+                y = 7 + r * 4
+                d.rectangle([x, y, x + 2, y + 2], outline=mix(CYAN, NIGHT, 0.4) + (255,))
+        d.line([(19, 12), (22, 12)], fill=GOLD + (255,))
+        d.line([(21, 10), (22, 12), (21, 14)], fill=GOLD + (255,))
+        d.rectangle([23, 10, 26, 14], outline=GOLD + (255,))
+    elif kind == "queue":
+        for r in range(4):
+            y = 6 + r * 4
+            d.rectangle([6, y, 8, y + 2], fill=mix(BLUE, NIGHT, 0.3) + (255,))
+            d.line([(10, y + 1), (14 + (r * 5) % 9, y + 1)], fill=mix(CYAN, NIGHT, 0.35) + (255,))
+            d.rectangle([10, y + 2, 25, y + 2], fill=mix(METAL_L, NIGHT, 0.5) + (255,))
+            d.rectangle([10, y + 2, 12 + (r * 7) % 12, y + 2], fill=GREEN + (255,))
     else:
         for r in range(3):
             for c in range(3):
@@ -371,6 +387,8 @@ def write_all(tex_dir_block, tex_dir_item):
         "server_rack_top": rack_top(),
         "storage_terminal_front": terminal_front("storage"),
         "pattern_terminal_front": terminal_front("pattern"),
+        "crafting_terminal_front": terminal_front("crafting"),
+        "queue_terminal_front": terminal_front("queue"),
         "terminal_side": terminal_side(),
         "assembler_front_idle": assembler_front(False),
         "assembler_front_active": assembler_front(True),

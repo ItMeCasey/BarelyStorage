@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelystorage:block/crafting_terminal"
+    },
+    "facing=east": {
+      "model": "barelystorage:block/crafting_terminal",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelystorage:block/crafting_terminal",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelystorage:block/crafting_terminal",
+      "y": 270
+    }
+  }
+}

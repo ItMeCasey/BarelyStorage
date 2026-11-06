@@ -54,14 +54,14 @@ public class NodeMenu extends StorageMenu {
         this.data = data;
         this.ghost = layout == Layout.BUS || layout == Layout.IMPORT || layout == Layout.EXPORT;
         boolean tall = layout == Layout.INTERFACE;
-        this.upgradeX = tall ? 80 : 8;
-        this.upgradeY = tall ? 30 : 30 + 5 * 18 + 14;
+        this.upgradeX = 176 + 8;
+        this.upgradeY = 30;
         this.areaX = 8;
         this.areaY = tall ? 98 : 30;
         this.bufferX = 8;
         this.bufferY = 30;
         for (int i = 0; i < UPGRADES; i++) {
-            addSlot(new Slot(upgrades, i, upgradeX + i * 18, upgradeY) {
+            addSlot(new Slot(upgrades, i, upgradeX, upgradeY + i * 18) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return stack.getItem() instanceof UpgradeItem;
@@ -108,7 +108,7 @@ public class NodeMenu extends StorageMenu {
             }
         }
         this.firstPlayerSlot = slots.size();
-        int playerY = tall ? areaY + 5 * 18 + 14 : upgradeY + 18 + 14;
+        int playerY = areaY + 5 * 18 + 14;
         playerSlots(inventory, 8, playerY);
         this.playerY = playerY;
         addDataSlots(data);

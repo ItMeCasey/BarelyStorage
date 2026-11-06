@@ -7,7 +7,7 @@ import com.itmecasey.barelystorage.StorageNetwork;
 import com.itmecasey.barelystorage.block.AssemblerBlockEntity;
 import com.itmecasey.barelystorage.block.RackBlockEntity;
 import com.itmecasey.barelystorage.item.PatternItem;
-import com.itmecasey.barelystorage.menu.PatternMenu;
+import com.itmecasey.barelystorage.menu.TerminalMenu;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -165,6 +165,8 @@ public final class ShotTour {
             put("pattern_terminal", 4, y, 0, "[facing=north]");
             put("rack_bus_cable", 5, y, 0, "");
             put("assembler", 6, y, 0, "");
+            put("queue_terminal", 4, y + 1, 0, "[facing=north]");
+            put("crafting_terminal", 5, y + 1, 0, "[facing=north]");
             put("server_rack", 0, y + 1, 0, "[facing=north]");
             put("rack_bus_cable", 1, y + 1, 0, "");
             put("storage_bus", 2, y + 1, 0, "[facing=east]");
@@ -271,6 +273,13 @@ public final class ShotTour {
         then(10, () -> onServer(server -> fillPatternGrid(server)));
         shoot("gui_pattern_terminal", 30);
         then(2, () -> close());
+        then(10, () -> open(new BlockPos(5, y + 1, 0)));
+        then(10, () -> setGrid(1, Items.OAK_PLANKS));
+        then(2, () -> setGrid(4, Items.OAK_PLANKS));
+        shoot("gui_crafting_terminal", 30);
+        then(2, () -> setGrid(0, Items.NETHERITE_INGOT));
+        shoot("gui_crafting_terminal_missing", 30);
+        then(2, () -> close());
         then(10, () -> open(new BlockPos(6, y, 0)));
         shoot("gui_assembler", 30);
         then(2, () -> close());
@@ -294,6 +303,9 @@ public final class ShotTour {
         }));
         then(30, () -> open(new BlockPos(0, y, 0)));
         shoot("gui_rack_halted", 40);
+        then(2, () -> close());
+        then(10, () -> open(new BlockPos(4, y + 1, 0)));
+        shoot("gui_queue", 40);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
@@ -333,18 +345,26 @@ public final class ShotTour {
 
     private static void fillPatternGrid(MinecraftServer server) {
         ServerPlayer p = server.getPlayerList().getPlayers().get(0);
-        if (!(p.containerMenu instanceof PatternMenu menu)) {
+        if (!(p.containerMenu instanceof TerminalMenu menu)) {
             return;
         }
         Item[] grid = {Items.OAK_PLANKS, Items.OAK_PLANKS, Items.OAK_PLANKS, null, Items.STICK, null, null, Items.STICK, null};
         for (int i = 0; i < 9; i++) {
-            if (grid[i] != null) {
-                menu.setCarried(new ItemStack(grid[i]));
-                menu.clicked(i, 0, ContainerInput.PICKUP, p);
-            }
+            menu.clickMenuButton(p, TerminalMenu.BTN_SET + i * 10000 + (grid[i] == null ? 0 : net.minecraft.core.registries.BuiltInRegistries.ITEM.getId(grid[i])));
         }
-        menu.setCarried(ItemStack.EMPTY);
+        menu.clickMenuButton(p, TerminalMenu.BTN_TAGS);
         menu.broadcastChanges();
+    }
+
+    /** Sets one grid slot of the open terminal the way a viewer's plus button does. */
+    private static void setGrid(int slot, Item item) {
+        onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            if (p.containerMenu instanceof TerminalMenu menu) {
+                menu.clickMenuButton(p, TerminalMenu.BTN_SET + slot * 10000 + net.minecraft.core.registries.BuiltInRegistries.ITEM.getId(item));
+                menu.broadcastChanges();
+            }
+        });
     }
 
     private static void open(BlockPos pos) {

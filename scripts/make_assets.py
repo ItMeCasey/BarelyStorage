@@ -28,7 +28,7 @@ def write(path, data):
             f.write("\n")
 
 
-BLOCKS = ["server_rack", "rack_bus_cable", "storage_bus", "interface_node", "import_node", "export_node", "storage_terminal", "pattern_terminal", "assembler"]
+BLOCKS = ["server_rack", "rack_bus_cable", "storage_bus", "interface_node", "import_node", "export_node", "storage_terminal", "crafting_terminal", "queue_terminal", "pattern_terminal", "assembler"]
 ITEMS = ["upgrade_speed", "upgrade_capacity", "upgrade_efficiency", "upgrade_filter", "cartridge_iron", "cartridge_steel", "cartridge_gold", "cartridge_obsidian", "cartridge_quantum",
          "basic_core", "ram_blade", "quantum_core", "blank_pattern", "crafting_pattern", "processing_pattern"]
 FACING_Y = {"north": 0, "east": 90, "south": 180, "west": 270}
@@ -57,7 +57,7 @@ def blockstates():
     # The assembler has no facing: rewrite plainly.
     write(os.path.join(bs, "assembler.json"), {"variants": {
         "active=false": {"model": model_ref("assembler_idle")}, "active=true": {"model": model_ref("assembler_active")}}})
-    for block in ("storage_terminal", "pattern_terminal"):
+    for block in ("storage_terminal", "crafting_terminal", "queue_terminal", "pattern_terminal"):
         variants = {}
         for facing, y in FACING_Y.items():
             v = {"model": model_ref(block)}
@@ -165,6 +165,8 @@ def recipes():
         "upgrade_efficiency": shaped(["QRQ", "RPR", "QRQ"], {"Q": m("quartz"), "R": m("redstone"), "P": f"{MOD}:blank_pattern"}, "upgrade_efficiency"),
         "upgrade_filter": shaped(["NRN", "RPR", "NRN"], {"N": m("iron_nugget"), "R": m("redstone"), "P": f"{MOD}:blank_pattern"}, "upgrade_filter"),
         "storage_terminal": shaped(["IGI", "RBR", "III"], {"I": m("iron_ingot"), "G": m("glass_pane"), "R": m("redstone"), "B": cable}, "storage_terminal"),
+        "crafting_terminal": shapeless([f"{MOD}:storage_terminal", m("crafting_table")], "crafting_terminal"),
+        "queue_terminal": shapeless([f"{MOD}:storage_terminal", m("clock"), m("redstone")], "queue_terminal"),
         "pattern_terminal": shapeless([f"{MOD}:storage_terminal", m("crafting_table"), f"{MOD}:blank_pattern"], "pattern_terminal"),
         "assembler": shaped(["IBI", "ITI", "IRI"], {"I": m("iron_ingot"), "B": cable, "T": m("crafting_table"), "R": m("redstone_block")}, "assembler"),
         "cartridge_iron": shaped(["IRI", "ICI", "III"], {"I": m("iron_ingot"), "R": m("redstone"), "C": m("chest")}, "cartridge_iron"),
@@ -212,6 +214,8 @@ LANG = {
     "block.barelystorage.export_node": "Export Node",
     "block.barelystorage.storage_terminal": "Storage Terminal",
     "block.barelystorage.pattern_terminal": "Pattern Terminal",
+    "block.barelystorage.crafting_terminal": "Crafting Terminal",
+    "block.barelystorage.queue_terminal": "Crafting Queue Terminal",
     "block.barelystorage.assembler": "Assembler",
     "item.barelystorage.upgrade_speed": "Speed Upgrade",
     "item.barelystorage.upgrade_capacity": "Capacity Upgrade",
@@ -303,6 +307,15 @@ LANG = {
     "gui.barelystorage.craftable": "Craftable: middle-click to craft",
     "gui.barelystorage.stored": "Stored: %s",
     "gui.barelystorage.encode": "Encode",
+    "gui.barelystorage.tags": "Tags",
+    "gui.barelystorage.tags_tip": "Tags: also accept items that share a tag with each ingredient",
+    "gui.barelystorage.queue_empty": "No crafting jobs",
+    "gui.barelystorage.queue_running": "Running",
+    "gui.barelystorage.queue_waiting": "Waiting",
+    "gui.barelystorage.queue_halted": "Halted",
+    "gui.barelystorage.queue_cancel": "Cancel job",
+    "gui.barelystorage.error_depth_short": "Thread Exhaustion: chain depth %s, max %s",
+    "gui.barelystorage.missing": "Missing ingredient",
     "gui.barelystorage.clear": "Clear",
     "gui.barelystorage.mode_crafting": "Crafting",
     "gui.barelystorage.mode_processing": "Processing",

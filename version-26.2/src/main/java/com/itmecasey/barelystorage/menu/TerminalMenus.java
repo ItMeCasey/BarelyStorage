@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.level.Level;
 
-/** Opens the Storage Terminal at the height (5, 7 or 9 rows) the player chose last. */
+/** Opens a terminal at the height (5, 7 or 9 rows) the player chose last. */
 public final class TerminalMenus {
     private static final Map<UUID, Integer> HEIGHT = new HashMap<>();
 
@@ -20,9 +20,17 @@ public final class TerminalMenus {
         HEIGHT.put(player.getUUID(), Math.max(0, Math.min(2, index)));
     }
 
-    public static void open(ServerPlayer player, Level level, BlockPos pos) {
+    public static void open(ServerPlayer player, Level level, BlockPos pos, TerminalMenu.Kind kind) {
         int rows = TerminalMenu.ROWS[HEIGHT.getOrDefault(player.getUUID(), 0)];
-        player.openMenu(new SimpleMenuProvider((id, inv, p) -> new TerminalMenu(rows, id, inv, level, pos),
-                Component.translatable("block.barelystorage.storage_terminal")));
+        String name = switch (kind) {
+            case STORAGE -> "block.barelystorage.storage_terminal";
+            case CRAFTING -> "block.barelystorage.crafting_terminal";
+            case PATTERN -> "block.barelystorage.pattern_terminal";
+        };
+        player.openMenu(new SimpleMenuProvider((id, inv, p) -> new TerminalMenu(kind, rows, id, inv, level, pos), Component.translatable(name)));
+    }
+
+    public static void openQueue(ServerPlayer player, Level level, BlockPos pos) {
+        player.openMenu(new SimpleMenuProvider((id, inv, p) -> new QueueMenu(id, inv, level, pos), Component.translatable("block.barelystorage.queue_terminal")));
     }
 }

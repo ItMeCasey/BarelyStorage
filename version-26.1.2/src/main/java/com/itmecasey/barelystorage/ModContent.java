@@ -16,7 +16,7 @@ import com.itmecasey.barelystorage.item.CartridgeItem;
 import com.itmecasey.barelystorage.item.PatternItem;
 import com.itmecasey.barelystorage.item.UpgradeItem;
 import com.itmecasey.barelystorage.menu.NodeMenu;
-import com.itmecasey.barelystorage.menu.PatternMenu;
+import com.itmecasey.barelystorage.menu.QueueMenu;
 import com.itmecasey.barelystorage.menu.RackMenu;
 import com.itmecasey.barelystorage.menu.TerminalMenu;
 import java.util.LinkedHashMap;
@@ -52,8 +52,8 @@ public final class ModContent {
     public static final BlockEntityType<ExportNodeBlockEntity> EXPORT;
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER;
     public static final MenuType<RackMenu> RACK_MENU = new MenuType<>(RackMenu::new, FeatureFlags.VANILLA_SET);
-    private static final Map<Integer, MenuType<TerminalMenu>> TERMINAL_MENUS = new LinkedHashMap<>();
-    public static final MenuType<PatternMenu> PATTERN_MENU = new MenuType<>(PatternMenu::new, FeatureFlags.VANILLA_SET);
+    private static final Map<String, MenuType<TerminalMenu>> TERMINAL_MENUS = new LinkedHashMap<>();
+    public static final MenuType<QueueMenu> QUEUE_MENU = new MenuType<>(QueueMenu::new, FeatureFlags.VANILLA_SET);
     public static final MenuType<NodeMenu> INTERFACE_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.INTERFACE, id, inv), FeatureFlags.VANILLA_SET);
     public static final MenuType<NodeMenu> ASSEMBLER_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.ASSEMBLER, id, inv), FeatureFlags.VANILLA_SET);
     public static final MenuType<NodeMenu> BUS_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.BUS, id, inv), FeatureFlags.VANILLA_SET);
@@ -61,8 +61,11 @@ public final class ModContent {
     public static final MenuType<NodeMenu> EXPORT_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.EXPORT, id, inv), FeatureFlags.VANILLA_SET);
 
     static {
-        for (int rows : TerminalMenu.ROWS) {
-            TERMINAL_MENUS.put(rows, new MenuType<>((id, inv) -> new TerminalMenu(rows, id, inv), FeatureFlags.VANILLA_SET));
+        for (TerminalMenu.Kind kind : TerminalMenu.Kind.values()) {
+            for (int rows : TerminalMenu.ROWS) {
+                TERMINAL_MENUS.put(kind.name().toLowerCase(java.util.Locale.ROOT) + "_terminal_" + rows,
+                        new MenuType<>((id, inv) -> new TerminalMenu(kind, rows, id, inv), FeatureFlags.VANILLA_SET));
+            }
         }
         RackBlock rack = new RackBlock(props("server_rack").mapColor(MapColor.METAL).strength(4.0F, 8.0F).sound(SoundType.METAL)
                 .requiresCorrectToolForDrops().lightLevel(s -> s.getValue(RackBlock.ONLINE) ? 6 : 0));
@@ -77,6 +80,10 @@ public final class ModContent {
         NodeBlock exp = new NodeBlock(NodeBlock.Kind.EXPORT, node("export_node"));
         block("export_node", exp);
         block("storage_terminal", new TerminalBlock(TerminalBlock.Kind.STORAGE, props("storage_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
+                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
+        block("crafting_terminal", new TerminalBlock(TerminalBlock.Kind.CRAFTING, props("crafting_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
+                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
+        block("queue_terminal", new TerminalBlock(TerminalBlock.Kind.QUEUE, props("queue_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
                 .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
         block("pattern_terminal", new TerminalBlock(TerminalBlock.Kind.PATTERN, props("pattern_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
                 .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
@@ -166,8 +173,8 @@ public final class ModContent {
         out.accept("assembler", ASSEMBLER);
     }
 
-    public static MenuType<TerminalMenu> terminalMenu(int rows) {
-        return TERMINAL_MENUS.get(rows);
+    public static MenuType<TerminalMenu> terminalMenu(TerminalMenu.Kind kind, int rows) {
+        return TERMINAL_MENUS.get(kind.name().toLowerCase(java.util.Locale.ROOT) + "_terminal_" + rows);
     }
 
     public static java.util.Collection<MenuType<TerminalMenu>> terminalMenus() {
@@ -176,8 +183,8 @@ public final class ModContent {
 
     public static void registerMenus(BiConsumer<String, MenuType<?>> out) {
         out.accept("server_rack", RACK_MENU);
-        TERMINAL_MENUS.forEach((rows, type) -> out.accept("storage_terminal_" + rows, type));
-        out.accept("pattern_terminal", PATTERN_MENU);
+        TERMINAL_MENUS.forEach(out::accept);
+        out.accept("queue_terminal", QUEUE_MENU);
         out.accept("interface_node", INTERFACE_MENU);
         out.accept("assembler", ASSEMBLER_MENU);
         out.accept("storage_bus", BUS_MENU);

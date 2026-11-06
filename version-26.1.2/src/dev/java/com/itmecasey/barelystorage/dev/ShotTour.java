@@ -7,7 +7,7 @@ import com.itmecasey.barelystorage.StorageNetwork;
 import com.itmecasey.barelystorage.block.AssemblerBlockEntity;
 import com.itmecasey.barelystorage.block.RackBlockEntity;
 import com.itmecasey.barelystorage.item.PatternItem;
-import com.itmecasey.barelystorage.menu.PatternMenu;
+import com.itmecasey.barelystorage.menu.TerminalMenu;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -94,7 +94,7 @@ public final class ShotTour {
     }
 
     private static void waitForMenu(Minecraft minecraft) {
-        if (minecraft.gui.overlay() != null || minecraft.level != null || minecraft.gui.screen() == null || ++idle < 20) {
+        if (minecraft.getOverlay() != null || minecraft.level != null || minecraft.screen == null || ++idle < 20) {
             return;
         }
         pauseOnLostFocus = minecraft.options.pauseOnLostFocus;
@@ -113,11 +113,11 @@ public final class ShotTour {
         idle = 0;
         LOGGER.info("BARELYSTORAGE-SHOTS creating world");
         minecraft.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(0L, false, false),
-                registries -> registries.lookupOrThrow(net.minecraft.core.registries.Registries.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).value().createWorldDimensions(), new TitleScreen());
+                WorldPresets::createFlatWorldDimensions, new TitleScreen());
     }
 
     private static void waitForWorld(Minecraft minecraft) {
-        if (minecraft.level == null || minecraft.player == null || minecraft.gui.screen() != null
+        if (minecraft.level == null || minecraft.player == null || minecraft.screen != null
                 || minecraft.getSingleplayerServer() == null || ++idle < 40) {
             return;
         }
@@ -165,6 +165,8 @@ public final class ShotTour {
             put("pattern_terminal", 4, y, 0, "[facing=north]");
             put("rack_bus_cable", 5, y, 0, "");
             put("assembler", 6, y, 0, "");
+            put("queue_terminal", 4, y + 1, 0, "[facing=north]");
+            put("crafting_terminal", 5, y + 1, 0, "[facing=north]");
             put("server_rack", 0, y + 1, 0, "[facing=north]");
             put("rack_bus_cable", 1, y + 1, 0, "");
             put("storage_bus", 2, y + 1, 0, "[facing=east]");
@@ -265,11 +267,18 @@ public final class ShotTour {
         shoot("gui_terminal_search", 30);
         then(2, () -> {
             Minecraft mc = Minecraft.getInstance();
-            mc.gui.screen().onClose();
+            mc.screen.onClose();
         });
         then(10, () -> open(new BlockPos(4, y, 0)));
         then(10, () -> onServer(server -> fillPatternGrid(server)));
         shoot("gui_pattern_terminal", 30);
+        then(2, () -> close());
+        then(10, () -> open(new BlockPos(5, y + 1, 0)));
+        then(10, () -> setGrid(1, Items.OAK_PLANKS));
+        then(2, () -> setGrid(4, Items.OAK_PLANKS));
+        shoot("gui_crafting_terminal", 30);
+        then(2, () -> setGrid(0, Items.NETHERITE_INGOT));
+        shoot("gui_crafting_terminal_missing", 30);
         then(2, () -> close());
         then(10, () -> open(new BlockPos(6, y, 0)));
         shoot("gui_assembler", 30);
@@ -294,6 +303,9 @@ public final class ShotTour {
         }));
         then(30, () -> open(new BlockPos(0, y, 0)));
         shoot("gui_rack_halted", 40);
+        then(2, () -> close());
+        then(10, () -> open(new BlockPos(4, y + 1, 0)));
+        shoot("gui_queue", 40);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
@@ -333,18 +345,26 @@ public final class ShotTour {
 
     private static void fillPatternGrid(MinecraftServer server) {
         ServerPlayer p = server.getPlayerList().getPlayers().get(0);
-        if (!(p.containerMenu instanceof PatternMenu menu)) {
+        if (!(p.containerMenu instanceof TerminalMenu menu)) {
             return;
         }
         Item[] grid = {Items.OAK_PLANKS, Items.OAK_PLANKS, Items.OAK_PLANKS, null, Items.STICK, null, null, Items.STICK, null};
         for (int i = 0; i < 9; i++) {
-            if (grid[i] != null) {
-                menu.setCarried(new ItemStack(grid[i]));
-                menu.clicked(i, 0, ContainerInput.PICKUP, p);
-            }
+            menu.clickMenuButton(p, TerminalMenu.BTN_SET + i * 10000 + (grid[i] == null ? 0 : net.minecraft.core.registries.BuiltInRegistries.ITEM.getId(grid[i])));
         }
-        menu.setCarried(ItemStack.EMPTY);
+        menu.clickMenuButton(p, TerminalMenu.BTN_TAGS);
         menu.broadcastChanges();
+    }
+
+    /** Sets one grid slot of the open terminal the way a viewer's plus button does. */
+    private static void setGrid(int slot, Item item) {
+        onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            if (p.containerMenu instanceof TerminalMenu menu) {
+                menu.clickMenuButton(p, TerminalMenu.BTN_SET + slot * 10000 + net.minecraft.core.registries.BuiltInRegistries.ITEM.getId(item));
+                menu.broadcastChanges();
+            }
+        });
     }
 
     private static void open(BlockPos pos) {
@@ -358,15 +378,15 @@ public final class ShotTour {
 
     private static void close() {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.gui.screen() != null) {
-            minecraft.gui.screen().onClose();
+        if (minecraft.screen != null) {
+            minecraft.screen.onClose();
         }
     }
 
     /** Clicks the open screen at a position relative to the top left of a 184 x 222 panel (a Storage Terminal at its smallest height). */
     private static void clickPanel(double dx, double dy) {
         Minecraft minecraft = Minecraft.getInstance();
-        net.minecraft.client.gui.screens.Screen screen = minecraft.gui.screen();
+        net.minecraft.client.gui.screens.Screen screen = minecraft.screen;
         if (screen == null) {
             return;
         }
@@ -379,9 +399,9 @@ public final class ShotTour {
 
     private static void typeIntoScreen(String text) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.gui.screen() != null) {
+        if (minecraft.screen != null) {
             for (char c : text.toCharArray()) {
-                minecraft.gui.screen().charTyped(new CharacterEvent(c));
+                minecraft.screen.charTyped(new CharacterEvent(c));
             }
         }
     }
@@ -402,13 +422,13 @@ public final class ShotTour {
     static void shoot(String name, int delay) {
         then(delay, () -> {
             Minecraft minecraft = Minecraft.getInstance();
-            minecraft.gui.hud.getChat().clearMessages(false);
-            minecraft.gui.toastManager().clear();
+            minecraft.gui.getChat().clearMessages(false);
+            minecraft.getToastManager().clear();
         });
         then(2, () -> {
             Minecraft minecraft = Minecraft.getInstance();
             LOGGER.info("BARELYSTORAGE-SHOTS {}", name);
-            Screenshot.grab(minecraft.gameDirectory, "barelystorage_" + name + ".png", minecraft.gameRenderer.mainRenderTarget(), 1,
+            Screenshot.grab(minecraft.gameDirectory, "barelystorage_" + name + ".png", minecraft.getMainRenderTarget(), 1,
                     message -> LOGGER.info("BARELYSTORAGE-SHOTS saved {}", name));
         });
     }

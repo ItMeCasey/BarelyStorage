@@ -42,6 +42,9 @@ def main():
     save("block", "server_rack_on", emit(on, "tray", 9), "server_rack_side")
     for kind in ("storage", "pattern"):
         save("block", f"{kind}_terminal", emit(load(f"{kind}_terminal"), "screen", 10), "terminal_side")
+    storage = load("storage_terminal")
+    for kind in ("crafting", "queue"):
+        save("block", f"{kind}_terminal", emit(json.loads(json.dumps(storage).replace("storage_terminal_front", f"{kind}_terminal_front")), "screen", 10), "terminal_side")
     save("block", "assembler_idle", load("assembler_idle"), "assembler_side")
     save("block", "assembler_active", emit(load("assembler_active"), "window", 10), "assembler_side")
     save("block", "rack_bus_cable_core", load("rack_bus_cable_core"), "rack_bus_cable")

@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -31,6 +32,8 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     private int requestSlot = -1;
     private int amount = 1;
     private final List<Button> requestButtons = new ArrayList<>();
+    private Button modeButton;
+    private Button tagsButton;
     private boolean draggingScroll;
     private int lastScrollSent = -1;
 
@@ -55,6 +58,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         addRenderableWidget(search);
         setInitialFocus(search);
         buildGlyphs();
+        buildExtras();
         buildRequest();
         updateVisibility();
         // Bring the server in line with the saved choices.
@@ -109,6 +113,54 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
             press(TerminalMenu.BTN_VIEW + ClientSettings.view);
         }, () -> Component.translatable("gui.barelystorage.tip_view", Component.translatable(new String[] {"gui.barelystorage.view_both",
                 "gui.barelystorage.view_available", "gui.barelystorage.view_craftable"}[ClientSettings.view]))));
+    }
+
+    /** Buttons under the item list: Clear for the Crafting Terminal; Mode, Tags, Encode and Clear for the Pattern Terminal. */
+    private void buildExtras() {
+        int y = topPos + menu.extrasY;
+        if (menu.kind() == TerminalMenu.Kind.CRAFTING) {
+            button(Component.translatable("gui.barelystorage.clear"), leftPos + 148, y + 40, 30, 14, b -> press(TerminalMenu.BTN_GRID_CLEAR));
+        } else if (menu.kind() == TerminalMenu.Kind.PATTERN) {
+            int row = y + 60;
+            modeButton = button(Component.empty(), leftPos + 8, row, 56, 14, b -> press(TerminalMenu.BTN_MODE));
+            tagsButton = addRenderableWidget(Button.builder(Ui.t(Component.translatable("gui.barelystorage.tags")), b -> press(TerminalMenu.BTN_TAGS))
+                    .bounds(leftPos + 66, row, 38, 14).tooltip(Tooltip.create(Component.translatable("gui.barelystorage.tags_tip"))).build());
+            button(Component.translatable("gui.barelystorage.encode"), leftPos + 106, row, 44, 14, b -> press(TerminalMenu.BTN_ENCODE));
+            button(Component.translatable("gui.barelystorage.clear"), leftPos + 152, row, 28, 14, b -> press(TerminalMenu.BTN_GRID_CLEAR));
+        }
+    }
+
+    private void drawExtras(GuiGraphicsExtractor g) {
+        if (menu.kind() == TerminalMenu.Kind.STORAGE) {
+            return;
+        }
+        int y = topPos + menu.extrasY;
+        if (menu.kind() == TerminalMenu.Kind.CRAFTING) {
+            Ui.text(g, font, "\u2192", leftPos + 100, y + 22, GOLD);
+            for (int i = 0; i < TerminalMenu.GRID; i++) {
+                if (menu.data(menu.dMissing(i)) != 0) {
+                    Slot s = menu.slots.get(menu.viewSlots() + i);
+                    g.fill(leftPos + s.x, topPos + s.y, leftPos + s.x + 16, topPos + s.y + 16, 0x99FF3030);
+                    g.outline(leftPos + s.x - 1, topPos + s.y - 1, 18, 18, Ui.RED);
+                }
+            }
+            if (menu.data(menu.dResult()) == 2) {
+                g.fill(leftPos + 124, y + 18, leftPos + 140, y + 34, 0x99FF3030);
+                Ui.text(g, font, Component.translatable("gui.barelystorage.missing"), leftPos + 92, y + 40, Ui.RED);
+            }
+        } else {
+            boolean processing = menu.processing();
+            Ui.text(g, font, "\u2192", leftPos + 90, y + 4, GOLD);
+            modeButton.setMessage(Ui.t(Component.translatable(processing ? "gui.barelystorage.mode_processing" : "gui.barelystorage.mode_crafting")));
+            tagsButton.setMessage(menu.tags() ? Ui.t(Component.translatable("gui.barelystorage.tags"), GOLD) : Ui.t(Component.translatable("gui.barelystorage.tags")));
+            Ui.text(g, font, Component.translatable("gui.barelystorage.blank"), leftPos + 126, y + 4, Ui.MUTED);
+            Ui.text(g, font, Component.translatable("gui.barelystorage.encoded"), leftPos + 126, y + 40, Ui.MUTED);
+            if (processing) {
+                g.fill(leftPos + 103, y + 17, leftPos + 121, y + 35, 0xAA0B0A14);
+            } else {
+                g.fill(leftPos + 77, y - 1, leftPos + 95, y + 53, 0xAA0B0A14);
+            }
+        }
     }
 
     private Button button(Component text, int x, int y, int w, int h, Button.OnPress press) {
@@ -258,6 +310,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         Ui.slots(g, menu.slots, leftPos, topPos);
         boolean online = menu.online();
         g.fill(leftPos + 166, topPos + 5, leftPos + 176, topPos + 9, online ? Ui.GREEN : Ui.RED);
+        drawExtras(g);
         g.fill(trackX(), trackY(), trackX() + TRACK_W, trackY() + trackH(), Ui.SLOT);
         if (menu.maxScroll() > 0) {
             int total = menu.rows() + menu.maxScroll();

@@ -3,7 +3,7 @@ package com.itmecasey.barelystorage.neoforge;
 import com.itmecasey.barelystorage.BarelyStorage;
 import com.itmecasey.barelystorage.ModContent;
 import com.itmecasey.barelystorage.client.NodeScreen;
-import com.itmecasey.barelystorage.client.PatternScreen;
+import com.itmecasey.barelystorage.client.QueueScreen;
 import com.itmecasey.barelystorage.client.RackScreen;
 import com.itmecasey.barelystorage.client.TerminalScreen;
 import net.neoforged.api.distmarker.Dist;
@@ -23,7 +23,7 @@ public final class NeoForgeClient {
         for (var type : ModContent.terminalMenus()) {
             event.register(type, TerminalScreen::new);
         }
-        event.register(ModContent.PATTERN_MENU, PatternScreen::new);
+        event.register(ModContent.QUEUE_MENU, QueueScreen::new);
         event.register(ModContent.INTERFACE_MENU, NodeScreen::new);
         event.register(ModContent.ASSEMBLER_MENU, NodeScreen::new);
         event.register(ModContent.BUS_MENU, NodeScreen::new);
