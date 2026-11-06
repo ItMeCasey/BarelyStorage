@@ -44,4 +44,4 @@ Spend: none
 - [x] Docs, README, wiki pages in the site repo (21 pages, deployed and checked live 2026-11-06) (w:3)
 - [x] CI build.yml, release.yml, publish script, issue templates (green builds, dry run and release run) (w:3)
 - [x] First release v2026.11.1: GitHub prerelease and three CurseForge betas (project 1786861, file ids 9472566-9472568) (w:2)
-- [ ] CurseForge approval of the 2026.11.1 files (Casey / CurseForge review) (w:1)
+- [x] CurseForge approval: project and the three 2026.11.1 files are public (checked 2026-11-06) (w:1)
