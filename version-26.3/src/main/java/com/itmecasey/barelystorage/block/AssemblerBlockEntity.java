@@ -20,11 +20,11 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 /** An Assembler: holds encoded patterns and runs crafting steps handed to it by the rack's crafting queue. */
-public class AssemblerBlockEntity extends BlockEntity {
-    public final SimpleContainer patterns = new SimpleContainer(9) {
+public class AssemblerBlockEntity extends UpgradeableBlockEntity {
+    public final SimpleContainer patterns = new SimpleContainer(MAX_ROWS * 9) {
         @Override
         public boolean canPlaceItem(int slot, ItemStack stack) {
-            return stack.getItem() instanceof PatternItem item && item.type() != PatternItem.Type.BLANK;
+            return slot < patternRows() * 9 && stack.getItem() instanceof PatternItem item && item.type() == PatternItem.Type.CRAFTING;
         }
 
         @Override
@@ -55,7 +55,7 @@ public class AssemblerBlockEntity extends BlockEntity {
     public void begin(Pattern pattern, int runs) {
         this.current = pattern;
         this.runs = runs;
-        this.ticksLeft = Math.max(1, runs * Settings.getInt("crafting.assembler_ticks_per_run"));
+        this.ticksLeft = Math.max(1, runs * Settings.getInt("crafting.assembler_ticks_per_run") / speed());
         this.pending = new ArrayList<>();
         setChanged();
     }
@@ -121,6 +121,7 @@ public class AssemblerBlockEntity extends BlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         patterns.storeAsItemList(output.list("patterns", ItemStack.OPTIONAL_CODEC));
+        saveUpgrades(output);
         if (current != null) {
             output.putString("current", current.encode());
             output.putInt("runs", runs);
@@ -133,6 +134,7 @@ public class AssemblerBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         patterns.fromItemList(input.listOrEmpty("patterns", ItemStack.OPTIONAL_CODEC));
+        loadUpgrades(input);
         current = null;
         input.getString("current").ifPresent(text -> {
             try {
@@ -158,6 +160,7 @@ public class AssemblerBlockEntity extends BlockEntity {
         if (level != null) {
             Containers.dropContents(level, pos, patterns);
         }
+        dropUpgrades(pos);
         StorageNetwork.invalidate();
     }
 }

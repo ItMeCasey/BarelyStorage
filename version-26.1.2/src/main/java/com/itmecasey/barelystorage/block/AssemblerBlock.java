@@ -3,7 +3,7 @@ package com.itmecasey.barelystorage.block;
 import com.itmecasey.barelystorage.ModContent;
 import com.itmecasey.barelystorage.NetNode;
 import com.itmecasey.barelystorage.StorageNetwork;
-import com.itmecasey.barelystorage.menu.GridMenu;
+import com.itmecasey.barelystorage.menu.NodeMenu;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,7 +82,7 @@ public class AssemblerBlock extends BaseEntityBlock implements NetNode {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof AssemblerBlockEntity be) {
-            player.openMenu(new SimpleMenuProvider((id, inv, p) -> GridMenu.assembler(id, inv, be.patterns),
+            player.openMenu(new SimpleMenuProvider((id, inv, p) -> NodeMenu.server(NodeMenu.Layout.ASSEMBLER, id, inv, be),
                     Component.translatable("block.barelystorage.assembler")));
         }
         return InteractionResult.SUCCESS;

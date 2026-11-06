@@ -211,7 +211,9 @@ public final class ShotTour {
             a.patterns.setItem(0, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.OAK_PLANKS, 4), new ItemStack(Items.OAK_LOG)));
             a.patterns.setItem(1, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.STICK, 4), new ItemStack(Items.OAK_PLANKS, 2)));
             a.patterns.setItem(2, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.IRON_PICKAXE), new ItemStack(Items.IRON_INGOT, 3), new ItemStack(Items.STICK, 2)));
-            a.patterns.setItem(3, encoded(Pattern.Kind.PROCESSING, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.RAW_IRON)));
+            if (level.getBlockEntity(new BlockPos(9, y + 2, 0)) instanceof com.itmecasey.barelystorage.block.InterfaceNodeBlockEntity node) {
+                node.patterns.setItem(0, encoded(Pattern.Kind.PROCESSING, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.RAW_IRON)));
+            }
             a.patterns.setItem(4, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.OAK_SLAB, 6), new ItemStack(Items.OAK_PLANKS, 3)));
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());

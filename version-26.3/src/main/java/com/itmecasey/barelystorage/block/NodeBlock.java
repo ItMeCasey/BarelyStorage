@@ -3,7 +3,7 @@ package com.itmecasey.barelystorage.block;
 import com.itmecasey.barelystorage.ModContent;
 import com.itmecasey.barelystorage.NetNode;
 import com.itmecasey.barelystorage.StorageNetwork;
-import com.itmecasey.barelystorage.menu.GridMenu;
+import com.itmecasey.barelystorage.menu.NodeMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 /** A node that snaps onto an inventory or machine face: Storage Bus, Interface Node or Import Node. */
 public class NodeBlock extends BaseEntityBlock implements NetNode {
-    public enum Kind { BUS, INTERFACE, IMPORT }
+    public enum Kind { BUS, INTERFACE, IMPORT, EXPORT }
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     private final Kind kind;
@@ -118,6 +118,7 @@ public class NodeBlock extends BaseEntityBlock implements NetNode {
             case BUS -> new StorageBusBlockEntity(pos, state);
             case INTERFACE -> new InterfaceNodeBlockEntity(pos, state);
             case IMPORT -> new ImportNodeBlockEntity(pos, state);
+            case EXPORT -> new ExportNodeBlockEntity(pos, state);
         };
     }
 
@@ -132,6 +133,7 @@ public class NodeBlock extends BaseEntityBlock implements NetNode {
             case BUS -> null;
             case INTERFACE -> createTickerHelper(type, ModContent.INTERFACE, InterfaceNodeBlockEntity::serverTick);
             case IMPORT -> createTickerHelper(type, ModContent.IMPORT, ImportNodeBlockEntity::serverTick);
+            case EXPORT -> createTickerHelper(type, ModContent.EXPORT, ExportNodeBlockEntity::serverTick);
         };
     }
 
@@ -153,16 +155,15 @@ public class NodeBlock extends BaseEntityBlock implements NetNode {
             return InteractionResult.SUCCESS;
         }
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof StorageBusBlockEntity bus) {
-            if (player.getMainHandItem().isEmpty()) {
-                player.sendOverlayMessage(Component.translatable("message.barelystorage.priority", bus.cyclePriority().label()));
-            }
-        } else if (be instanceof InterfaceNodeBlockEntity node) {
-            player.openMenu(new SimpleMenuProvider((id, inv, p) -> GridMenu.interfaceNode(id, inv, node.buffer),
-                    Component.translatable("block.barelystorage.interface_node")));
-        } else if (be instanceof ImportNodeBlockEntity) {
-            StorageNetwork net = StorageNetwork.find(level, pos);
-            player.sendOverlayMessage(Component.translatable(net.online() ? "message.barelystorage.node_online" : "message.barelystorage.node_offline"));
+        if (be instanceof UpgradeableBlockEntity machine) {
+            NodeMenu.Layout layout = switch (kind) {
+                case BUS -> NodeMenu.Layout.BUS;
+                case INTERFACE -> NodeMenu.Layout.INTERFACE;
+                case IMPORT -> NodeMenu.Layout.IMPORT;
+                case EXPORT -> NodeMenu.Layout.EXPORT;
+            };
+            player.openMenu(new SimpleMenuProvider((id, inv, p) -> NodeMenu.server(layout, id, inv, machine),
+                    Component.translatable(getDescriptionId())));
         }
         return InteractionResult.SUCCESS;
     }

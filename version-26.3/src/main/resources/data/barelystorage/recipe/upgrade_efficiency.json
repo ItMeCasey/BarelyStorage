@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "QRQ",
+    "RPR",
+    "QRQ"
+  ],
+  "key": {
+    "Q": "minecraft:quartz",
+    "R": "minecraft:redstone",
+    "P": "barelystorage:blank_pattern"
+  },
+  "result": {
+    "id": "barelystorage:upgrade_efficiency",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NRN",
+    "RPR",
+    "NRN"
+  ],
+  "key": {
+    "N": "minecraft:iron_nugget",
+    "R": "minecraft:redstone",
+    "P": "barelystorage:blank_pattern"
+  },
+  "result": {
+    "id": "barelystorage:upgrade_filter",
+    "count": 1
+  }
+}

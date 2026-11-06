@@ -1,6 +1,7 @@
 package com.itmecasey.barelystorage;
 
 import com.itmecasey.barelystorage.block.AssemblerBlockEntity;
+import com.itmecasey.barelystorage.block.ExportNodeBlockEntity;
 import com.itmecasey.barelystorage.block.ImportNodeBlockEntity;
 import com.itmecasey.barelystorage.block.InterfaceNodeBlockEntity;
 import com.itmecasey.barelystorage.block.RackBlockEntity;
@@ -46,6 +47,7 @@ public final class StorageNetwork implements CraftScheduler.Host {
     public final List<StorageBusBlockEntity> buses = new ArrayList<>();
     public final List<InterfaceNodeBlockEntity> interfaces = new ArrayList<>();
     public final List<ImportNodeBlockEntity> imports = new ArrayList<>();
+    public final List<ExportNodeBlockEntity> exports = new ArrayList<>();
     public final List<AssemblerBlockEntity> assemblers = new ArrayList<>();
     private StoragePool pool;
     private List<Pattern> patterns;
@@ -77,6 +79,8 @@ public final class StorageNetwork implements CraftScheduler.Host {
                 net.interfaces.add(i);
             } else if (be instanceof ImportNodeBlockEntity i) {
                 net.imports.add(i);
+            } else if (be instanceof ExportNodeBlockEntity x) {
+                net.exports.add(x);
             } else if (be instanceof AssemblerBlockEntity a) {
                 net.assemblers.add(a);
             }
@@ -167,8 +171,16 @@ public final class StorageNetwork implements CraftScheduler.Host {
         if (patterns == null) {
             patterns = new ArrayList<>();
             if (online()) {
+                for (InterfaceNodeBlockEntity node : interfaces) {
+                    for (int i = 0; i < node.patternRows() * 9; i++) {
+                        Pattern p = PatternItem.read(node.patterns.getItem(i));
+                        if (p != null) {
+                            patterns.add(p);
+                        }
+                    }
+                }
                 for (AssemblerBlockEntity a : assemblers) {
-                    for (int i = 0; i < a.patterns.getContainerSize(); i++) {
+                    for (int i = 0; i < a.patternRows() * 9; i++) {
                         Pattern p = PatternItem.read(a.patterns.getItem(i));
                         if (p != null) {
                             patterns.add(p);
@@ -272,7 +284,7 @@ public final class StorageNetwork implements CraftScheduler.Host {
             return 0;
         }
         for (InterfaceNodeBlockEntity node : interfaces) {
-            if (!node.accepts(pattern, registries())) {
+            if (!node.holds(pattern)) {
                 continue;
             }
             for (int r = (int) fit; r >= 1; r--) {
@@ -356,10 +368,16 @@ public final class StorageNetwork implements CraftScheduler.Host {
     private static final class BusProvider implements StorageProvider {
         private final StorageBusBlockEntity bus;
         private final HolderLookup.Provider reg;
+        private final java.util.Set<ItemKey> allowed;
 
         BusProvider(StorageBusBlockEntity bus, HolderLookup.Provider reg) {
             this.bus = bus;
             this.reg = reg;
+            this.allowed = bus.filterKeys(reg);
+        }
+
+        private boolean allows(ItemKey key) {
+            return allowed.isEmpty() || allowed.contains(key);
         }
 
         @Override
@@ -375,7 +393,7 @@ public final class StorageNetwork implements CraftScheduler.Host {
             }
             for (int i = 0; i < inv.slots(); i++) {
                 ItemStack s = inv.get(i);
-                if (!s.isEmpty() && !inv.extract(i, 1, true).isEmpty()) {
+                if (!s.isEmpty() && allows(Keys.of(s, reg)) && !inv.extract(i, 1, true).isEmpty()) {
                     out.merge(Keys.of(s, reg), (long) s.getCount(), Long::sum);
                 }
             }
@@ -385,6 +403,9 @@ public final class StorageNetwork implements CraftScheduler.Host {
         public long count(ItemKey key) {
             ExternalInventory inv = bus.inventory();
             long n = 0;
+            if (!allows(key)) {
+                return 0;
+            }
             if (inv != null) {
                 for (int i = 0; i < inv.slots(); i++) {
                     ItemStack s = inv.get(i);
@@ -399,7 +420,7 @@ public final class StorageNetwork implements CraftScheduler.Host {
         @Override
         public long insert(ItemKey key, long amount, boolean simulate) {
             ExternalInventory inv = bus.inventory();
-            if (inv == null) {
+            if (inv == null || !allows(key)) {
                 return 0;
             }
             long done = 0;
@@ -420,7 +441,7 @@ public final class StorageNetwork implements CraftScheduler.Host {
         @Override
         public long extract(ItemKey key, long amount, boolean simulate) {
             ExternalInventory inv = bus.inventory();
-            if (inv == null) {
+            if (inv == null || !allows(key)) {
                 return 0;
             }
             long got = 0;

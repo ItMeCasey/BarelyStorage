@@ -28,8 +28,8 @@ def write(path, data):
             f.write("\n")
 
 
-BLOCKS = ["server_rack", "rack_bus_cable", "storage_bus", "interface_node", "import_node", "storage_terminal", "pattern_terminal", "assembler"]
-ITEMS = ["cartridge_iron", "cartridge_steel", "cartridge_gold", "cartridge_obsidian", "cartridge_quantum",
+BLOCKS = ["server_rack", "rack_bus_cable", "storage_bus", "interface_node", "import_node", "export_node", "storage_terminal", "pattern_terminal", "assembler"]
+ITEMS = ["upgrade_speed", "upgrade_capacity", "upgrade_efficiency", "upgrade_filter", "cartridge_iron", "cartridge_steel", "cartridge_gold", "cartridge_obsidian", "cartridge_quantum",
          "basic_core", "ram_blade", "quantum_core", "blank_pattern", "crafting_pattern", "processing_pattern"]
 FACING_Y = {"north": 0, "east": 90, "south": 180, "west": 270}
 
@@ -159,6 +159,11 @@ def recipes():
         "storage_bus": shaped([" C ", "IHI", " R "], {"C": cable, "I": m("iron_ingot"), "H": m("hopper"), "R": m("redstone")}, "storage_bus"),
         "interface_node": shaped([" C ", "IDI", " R "], {"C": cable, "I": m("iron_ingot"), "D": m("dropper"), "R": m("redstone")}, "interface_node"),
         "import_node": shaped([" C ", "IHI", " Q "], {"C": cable, "I": m("iron_ingot"), "H": m("hopper"), "Q": m("quartz")}, "import_node"),
+        "export_node": shaped([" C ", "IHI", " G "], {"C": cable, "I": m("iron_ingot"), "H": m("hopper"), "G": m("gold_ingot")}, "export_node"),
+        "upgrade_speed": shaped(["GRG", "RPR", "GRG"], {"G": m("gold_ingot"), "R": m("redstone"), "P": f"{MOD}:blank_pattern"}, "upgrade_speed"),
+        "upgrade_capacity": shaped(["LRL", "RPR", "LRL"], {"L": m("lapis_lazuli"), "R": m("redstone"), "P": f"{MOD}:blank_pattern"}, "upgrade_capacity"),
+        "upgrade_efficiency": shaped(["QRQ", "RPR", "QRQ"], {"Q": m("quartz"), "R": m("redstone"), "P": f"{MOD}:blank_pattern"}, "upgrade_efficiency"),
+        "upgrade_filter": shaped(["NRN", "RPR", "NRN"], {"N": m("iron_nugget"), "R": m("redstone"), "P": f"{MOD}:blank_pattern"}, "upgrade_filter"),
         "storage_terminal": shaped(["IGI", "RBR", "III"], {"I": m("iron_ingot"), "G": m("glass_pane"), "R": m("redstone"), "B": cable}, "storage_terminal"),
         "pattern_terminal": shapeless([f"{MOD}:storage_terminal", m("crafting_table"), f"{MOD}:blank_pattern"], "pattern_terminal"),
         "assembler": shaped(["IBI", "ITI", "IRI"], {"I": m("iron_ingot"), "B": cable, "T": m("crafting_table"), "R": m("redstone_block")}, "assembler"),
@@ -204,9 +209,26 @@ LANG = {
     "block.barelystorage.storage_bus": "Storage Bus",
     "block.barelystorage.interface_node": "Interface Node",
     "block.barelystorage.import_node": "Import Node",
+    "block.barelystorage.export_node": "Export Node",
     "block.barelystorage.storage_terminal": "Storage Terminal",
     "block.barelystorage.pattern_terminal": "Pattern Terminal",
     "block.barelystorage.assembler": "Assembler",
+    "item.barelystorage.upgrade_speed": "Speed Upgrade",
+    "item.barelystorage.upgrade_capacity": "Capacity Upgrade",
+    "item.barelystorage.upgrade_efficiency": "Efficiency Upgrade",
+    "item.barelystorage.upgrade_filter": "Filter Upgrade",
+    "tooltip.barelystorage.upgrade_speed": "Faster crafting and item moves.",
+    "tooltip.barelystorage.upgrade_capacity": "Opens another row of pattern slots.",
+    "tooltip.barelystorage.upgrade_efficiency": "Lowers the rack's power upkeep.",
+    "tooltip.barelystorage.upgrade_filter": "Opens another row of filter slots.",
+    "gui.barelystorage.upgrades": "Upgrades",
+    "gui.barelystorage.buffer": "Buffer",
+    "gui.barelystorage.crafting_patterns": "Crafting patterns",
+    "gui.barelystorage.processing_patterns": "Processing patterns",
+    "gui.barelystorage.import_filter": "Filter (empty imports everything)",
+    "gui.barelystorage.export_filter": "Filter (empty exports nothing)",
+    "gui.barelystorage.bus_filter": "Filter (empty maps everything)",
+    "gui.barelystorage.priority": "Priority: %s",
     "item.barelystorage.cartridge_iron": "Iron Drive",
     "item.barelystorage.cartridge_steel": "Steel Drive",
     "item.barelystorage.cartridge_gold": "Gold Drive",

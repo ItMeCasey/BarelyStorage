@@ -1,7 +1,7 @@
 package com.itmecasey.barelystorage.forge;
 
 import com.itmecasey.barelystorage.ModContent;
-import com.itmecasey.barelystorage.client.GridScreen;
+import com.itmecasey.barelystorage.client.NodeScreen;
 import com.itmecasey.barelystorage.client.PatternScreen;
 import com.itmecasey.barelystorage.client.RackScreen;
 import com.itmecasey.barelystorage.client.TerminalScreen;
@@ -23,8 +23,11 @@ final class ForgeClient {
             MenuScreens.register(ModContent.RACK_MENU, RackScreen::new);
             MenuScreens.register(ModContent.TERMINAL_MENU, TerminalScreen::new);
             MenuScreens.register(ModContent.PATTERN_MENU, PatternScreen::new);
-            MenuScreens.register(ModContent.INTERFACE_MENU, GridScreen::new);
-            MenuScreens.register(ModContent.ASSEMBLER_MENU, GridScreen::new);
+            MenuScreens.register(ModContent.INTERFACE_MENU, NodeScreen::new);
+            MenuScreens.register(ModContent.ASSEMBLER_MENU, NodeScreen::new);
+            MenuScreens.register(ModContent.BUS_MENU, NodeScreen::new);
+            MenuScreens.register(ModContent.IMPORT_MENU, NodeScreen::new);
+            MenuScreens.register(ModContent.EXPORT_MENU, NodeScreen::new);
         });
     }
 }

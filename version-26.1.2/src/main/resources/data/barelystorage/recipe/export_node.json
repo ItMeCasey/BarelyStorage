@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "IHI",
+    " G "
+  ],
+  "key": {
+    "C": "barelystorage:rack_bus_cable",
+    "I": "minecraft:iron_ingot",
+    "H": "minecraft:hopper",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "barelystorage:export_node",
+    "count": 1
+  }
+}

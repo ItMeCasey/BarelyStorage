@@ -333,6 +333,33 @@ def pattern(accent):
     return im
 
 
+def upgrade_card(accent, glyph):
+    im = img()
+    d = ImageDraw.Draw(im)
+    d.rectangle([5, 3, 26, 28], fill=NIGHT + (255,))
+    for y in range(4, 28):
+        d.line([(6, y), (25, y)], fill=mix(METAL_L, METAL_D, (y - 4) / 24) + (255,))
+    d.rectangle([7, 5, 24, 20], fill=mix(accent, NIGHT, 0.82) + (255,))
+    c = accent + (255,)
+    if glyph == "speed":
+        d.polygon([(17, 6), (10, 14), (15, 14), (13, 19), (21, 11), (16, 11)], fill=c)
+    elif glyph == "capacity":
+        for r in range(3):
+            for k in range(3):
+                d.rectangle([10 + k * 5, 7 + r * 4, 12 + k * 5, 9 + r * 4], fill=c)
+    elif glyph == "efficiency":
+        d.rectangle([10, 8, 21, 17], outline=c)
+        d.rectangle([12, 10, 17, 15], fill=c)
+        d.rectangle([22, 11, 23, 14], fill=c)
+    else:
+        d.polygon([(9, 7), (22, 7), (17, 13), (17, 18), (14, 18), (14, 13)], fill=c)
+    d.rectangle([7, 23, 24, 26], fill=GOLD_D + (255,))
+    for x in range(8, 24, 2):
+        d.line([(x, 23), (x, 26)], fill=GOLD_L + (255,))
+    led(im, 8, 21, accent, True, 2, 1)
+    return im
+
+
 def write_all(tex_dir_block, tex_dir_item):
     import os
     os.makedirs(tex_dir_block, exist_ok=True)
@@ -353,10 +380,15 @@ def write_all(tex_dir_block, tex_dir_item):
         "storage_bus": node_tex(BLUE),
         "interface_node": node_tex(GOLD),
         "import_node": node_tex(GREEN),
+        "export_node": node_tex(RED),
     }
     for name, im in blocks.items():
         im.save(os.path.join(tex_dir_block, name + ".png"))
     items = {
+        "upgrade_speed": upgrade_card(GOLD, "speed"),
+        "upgrade_capacity": upgrade_card(BLUE, "capacity"),
+        "upgrade_efficiency": upgrade_card(GREEN, "efficiency"),
+        "upgrade_filter": upgrade_card(PURPLE, "filter"),
         "cartridge_iron": cartridge((150, 154, 168), (200, 205, 220)),
         "cartridge_steel": cartridge((96, 128, 170), BLUE),
         "cartridge_gold": cartridge((220, 168, 56), GOLD_L),

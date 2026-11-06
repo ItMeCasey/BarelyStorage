@@ -3,6 +3,7 @@ package com.itmecasey.barelystorage;
 import com.itmecasey.barelystorage.block.AssemblerBlock;
 import com.itmecasey.barelystorage.block.AssemblerBlockEntity;
 import com.itmecasey.barelystorage.block.CableBlock;
+import com.itmecasey.barelystorage.block.ExportNodeBlockEntity;
 import com.itmecasey.barelystorage.block.ImportNodeBlockEntity;
 import com.itmecasey.barelystorage.block.InterfaceNodeBlockEntity;
 import com.itmecasey.barelystorage.block.NodeBlock;
@@ -13,7 +14,8 @@ import com.itmecasey.barelystorage.block.TerminalBlock;
 import com.itmecasey.barelystorage.item.BladeItem;
 import com.itmecasey.barelystorage.item.CartridgeItem;
 import com.itmecasey.barelystorage.item.PatternItem;
-import com.itmecasey.barelystorage.menu.GridMenu;
+import com.itmecasey.barelystorage.item.UpgradeItem;
+import com.itmecasey.barelystorage.menu.NodeMenu;
 import com.itmecasey.barelystorage.menu.PatternMenu;
 import com.itmecasey.barelystorage.menu.RackMenu;
 import com.itmecasey.barelystorage.menu.TerminalMenu;
@@ -47,12 +49,16 @@ public final class ModContent {
     public static final BlockEntityType<StorageBusBlockEntity> BUS;
     public static final BlockEntityType<InterfaceNodeBlockEntity> INTERFACE;
     public static final BlockEntityType<ImportNodeBlockEntity> IMPORT;
+    public static final BlockEntityType<ExportNodeBlockEntity> EXPORT;
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER;
     public static final MenuType<RackMenu> RACK_MENU = new MenuType<>(RackMenu::new, FeatureFlags.VANILLA_SET);
     public static final MenuType<TerminalMenu> TERMINAL_MENU = new MenuType<>(TerminalMenu::new, FeatureFlags.VANILLA_SET);
     public static final MenuType<PatternMenu> PATTERN_MENU = new MenuType<>(PatternMenu::new, FeatureFlags.VANILLA_SET);
-    public static final MenuType<GridMenu> INTERFACE_MENU = new MenuType<>(GridMenu::clientInterface, FeatureFlags.VANILLA_SET);
-    public static final MenuType<GridMenu> ASSEMBLER_MENU = new MenuType<>(GridMenu::clientAssembler, FeatureFlags.VANILLA_SET);
+    public static final MenuType<NodeMenu> INTERFACE_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.INTERFACE, id, inv), FeatureFlags.VANILLA_SET);
+    public static final MenuType<NodeMenu> ASSEMBLER_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.ASSEMBLER, id, inv), FeatureFlags.VANILLA_SET);
+    public static final MenuType<NodeMenu> BUS_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.BUS, id, inv), FeatureFlags.VANILLA_SET);
+    public static final MenuType<NodeMenu> IMPORT_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.IMPORT, id, inv), FeatureFlags.VANILLA_SET);
+    public static final MenuType<NodeMenu> EXPORT_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.EXPORT, id, inv), FeatureFlags.VANILLA_SET);
 
     static {
         RackBlock rack = new RackBlock(props("server_rack").mapColor(MapColor.METAL).strength(4.0F, 8.0F).sound(SoundType.METAL)
@@ -65,6 +71,8 @@ public final class ModContent {
         block("storage_bus", bus);
         block("interface_node", iface);
         block("import_node", imp);
+        NodeBlock exp = new NodeBlock(NodeBlock.Kind.EXPORT, node("export_node"));
+        block("export_node", exp);
         block("storage_terminal", new TerminalBlock(TerminalBlock.Kind.STORAGE, props("storage_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
                 .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
         block("pattern_terminal", new TerminalBlock(TerminalBlock.Kind.PATTERN, props("pattern_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
@@ -74,9 +82,13 @@ public final class ModContent {
         BUS = new BlockEntityType<>(StorageBusBlockEntity::new, Set.of(bus));
         INTERFACE = new BlockEntityType<>(InterfaceNodeBlockEntity::new, Set.of(iface));
         IMPORT = new BlockEntityType<>(ImportNodeBlockEntity::new, Set.of(imp));
+        EXPORT = new BlockEntityType<>(ExportNodeBlockEntity::new, Set.of(exp));
         ASSEMBLER = new BlockEntityType<>(AssemblerBlockEntity::new, Set.of(BLOCKS.get("assembler")));
         for (Tier t : Tier.values()) {
             item("cartridge_" + t.id(), new CartridgeItem(t, itemProps("cartridge_" + t.id())));
+        }
+        for (UpgradeItem.Kind k : UpgradeItem.Kind.values()) {
+            item("upgrade_" + k.key(), new UpgradeItem(k, itemProps("upgrade_" + k.key())));
         }
         item("basic_core", new BladeItem(BladeItem.Kind.BASIC_CORE, itemProps("basic_core")));
         item("ram_blade", new BladeItem(BladeItem.Kind.RAM_BLADE, itemProps("ram_blade")));
@@ -147,6 +159,7 @@ public final class ModContent {
         out.accept("storage_bus", BUS);
         out.accept("interface_node", INTERFACE);
         out.accept("import_node", IMPORT);
+        out.accept("export_node", EXPORT);
         out.accept("assembler", ASSEMBLER);
     }
 
@@ -156,5 +169,8 @@ public final class ModContent {
         out.accept("pattern_terminal", PATTERN_MENU);
         out.accept("interface_node", INTERFACE_MENU);
         out.accept("assembler", ASSEMBLER_MENU);
+        out.accept("storage_bus", BUS_MENU);
+        out.accept("import_node", IMPORT_MENU);
+        out.accept("export_node", EXPORT_MENU);
     }
 }

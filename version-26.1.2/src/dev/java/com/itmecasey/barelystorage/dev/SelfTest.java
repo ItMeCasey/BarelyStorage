@@ -9,6 +9,7 @@ import com.itmecasey.barelystorage.Pattern;
 import com.itmecasey.barelystorage.Settings;
 import com.itmecasey.barelystorage.StorageNetwork;
 import com.itmecasey.barelystorage.block.AssemblerBlockEntity;
+import com.itmecasey.barelystorage.block.ExportNodeBlockEntity;
 import com.itmecasey.barelystorage.block.ImportNodeBlockEntity;
 import com.itmecasey.barelystorage.block.InterfaceNodeBlockEntity;
 import com.itmecasey.barelystorage.block.NodeBlock;
@@ -65,6 +66,7 @@ public final class SelfTest {
             storageBus(new BlockPos(x, y, z + 12));
             furnaceProcessing(new BlockPos(x, y + 6, z));
             craftingAndHalt(new BlockPos(x, y + 6, z + 8));
+            filtersAndUpgrades(new BlockPos(x, y + 12, z));
         } catch (RuntimeException e) {
             LOGGER.error("SELFTEST error", e);
             verdict("selftest_ran_clean", false, e.toString());
@@ -231,11 +233,11 @@ public final class SelfTest {
         placeNode(p.east(2).below(), "import_node", Direction.UP);
         place(p.east().south(), "assembler");
         AssemblerBlockEntity asm = (AssemblerBlockEntity) level.getBlockEntity(p.east().south());
-        asm.patterns.setItem(0, encoded(pattern(Pattern.Kind.PROCESSING, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.RAW_IRON))));
         FurnaceBlockEntity furnace = (FurnaceBlockEntity) level.getBlockEntity(p.east(2));
         furnace.setItem(1, new ItemStack(Items.COAL, 1));
         InterfaceNodeBlockEntity iface = (InterfaceNodeBlockEntity) level.getBlockEntity(p.east(2).above());
         ImportNodeBlockEntity imp = (ImportNodeBlockEntity) level.getBlockEntity(p.east(2).below());
+        iface.patterns.setItem(0, encoded(pattern(Pattern.Kind.PROCESSING, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.RAW_IRON))));
         tick(r);
         net(p).insert(new ItemStack(Items.RAW_IRON, 3));
         var plan = net(p).requestCraft(key(Items.IRON_INGOT), 2);
@@ -254,6 +256,55 @@ public final class SelfTest {
                         + " steps=" + (r.scheduler().jobs().isEmpty() ? "-" : r.scheduler().jobs().get(0).steps.get(0).pending + "/" + r.scheduler().jobs().get(0).steps.get(0).active)
                         + " err=" + r.scheduler().lastError());
         clear(p.offset(-1, -2, -1), p.offset(4, 2, 2));
+    }
+
+    private static void filtersAndUpgrades(BlockPos p) {
+        clear(p.offset(-1, -1, -2), p.offset(6, 1, 2));
+        RackBlockEntity r = rack(p);
+        r.drives.setItem(0, cart("cartridge_gold"));
+        r.setEnergy(r.maxEnergy());
+        place(p.east(), "rack_bus_cable");
+        placeNode(p.east(2), "export_node", Direction.EAST);
+        level.setBlock(p.east(3), Blocks.CHEST.defaultBlockState(), 3);
+        placeNode(p.east().north(), "import_node", Direction.NORTH);
+        level.setBlock(p.east().north(2), Blocks.CHEST.defaultBlockState(), 3);
+        ChestBlockEntity source = (ChestBlockEntity) level.getBlockEntity(p.east().north(2));
+        source.setItem(0, new ItemStack(Items.IRON_INGOT, 5));
+        source.setItem(1, new ItemStack(Items.GOLD_INGOT, 5));
+        ImportNodeBlockEntity importer = (ImportNodeBlockEntity) level.getBlockEntity(p.east().north());
+        importer.filter.setItem(0, new ItemStack(Items.IRON_INGOT));
+        tick(r);
+        net(p).insert(new ItemStack(Items.DIAMOND, 20));
+        net(p).insert(new ItemStack(Items.EMERALD, 20));
+        ExportNodeBlockEntity export = (ExportNodeBlockEntity) level.getBlockEntity(p.east(2));
+        ChestBlockEntity out = (ChestBlockEntity) level.getBlockEntity(p.east(3));
+        for (int i = 0; i < 40; i++) {
+            ExportNodeBlockEntity.serverTick(level, export.getBlockPos(), level.getBlockState(export.getBlockPos()), export);
+        }
+        verdict("export_node_with_empty_filter_pushes_nothing", out.isEmpty(), "chest=" + out.countItem(Items.DIAMOND));
+        export.filter.setItem(0, new ItemStack(Items.DIAMOND));
+        for (int i = 0; i < 40; i++) {
+            ExportNodeBlockEntity.serverTick(level, export.getBlockPos(), level.getBlockState(export.getBlockPos()), export);
+        }
+        verdict("export_node_pushes_only_filtered_items", out.countItem(Items.DIAMOND) == 20 && out.countItem(Items.EMERALD) == 0, "diamonds=" + out.countItem(Items.DIAMOND));
+        for (int i = 0; i < 40; i++) {
+            ImportNodeBlockEntity.serverTick(level, importer.getBlockPos(), level.getBlockState(importer.getBlockPos()), importer);
+        }
+        verdict("import_node_filter_takes_only_listed_items", source.countItem(Items.IRON_INGOT) == 0 && source.countItem(Items.GOLD_INGOT) == 5
+                && net(p).pool().count(key(Items.IRON_INGOT)) == 5, "iron left=" + source.countItem(Items.IRON_INGOT) + " gold left=" + source.countItem(Items.GOLD_INGOT));
+        importer.filter.setItem(0, ItemStack.EMPTY);
+        for (int i = 0; i < 40; i++) {
+            ImportNodeBlockEntity.serverTick(level, importer.getBlockPos(), level.getBlockState(importer.getBlockPos()), importer);
+        }
+        verdict("import_node_with_empty_filter_takes_everything", source.isEmpty(), "gold left=" + source.countItem(Items.GOLD_INGOT));
+        long before = export.speed();
+        export.upgrades.setItem(0, new ItemStack(ModContent.item("upgrade_speed")));
+        export.filter.setItem(9, new ItemStack(Items.EMERALD));
+        verdict("speed_card_raises_speed_and_filter_rows_are_locked_until_a_filter_card",
+                before == 1 && export.speed() == 2 && export.filterRows() == 1 && export.filterKeys(level.registryAccess()).size() == 1, "speed=" + export.speed());
+        export.upgrades.setItem(1, new ItemStack(ModContent.item("upgrade_filter")));
+        verdict("filter_card_opens_a_row", export.filterRows() == 2 && export.filterKeys(level.registryAccess()).size() == 2, "rows=" + export.filterRows());
+        clear(p.offset(-1, -1, -2), p.offset(6, 1, 2));
     }
 
     private static void craftingAndHalt(BlockPos p) {

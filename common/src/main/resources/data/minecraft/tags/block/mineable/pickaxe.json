@@ -6,6 +6,7 @@
     "barelystorage:storage_bus",
     "barelystorage:interface_node",
     "barelystorage:import_node",
+    "barelystorage:export_node",
     "barelystorage:storage_terminal",
     "barelystorage:pattern_terminal",
     "barelystorage:assembler"

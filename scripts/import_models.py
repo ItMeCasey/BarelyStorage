@@ -54,6 +54,8 @@ def main():
                 el["from"] = [6.5, 6.5, 5]
                 el["to"] = [9.5, 9.5, 9.5]
         save("block", n, model, n)
+        if n == "import_node":
+            save("block", "export_node", json.loads(json.dumps(model).replace("import_node", "export_node")), "export_node")
     print("imported models")
 
 
