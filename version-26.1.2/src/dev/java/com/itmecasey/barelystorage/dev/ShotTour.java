@@ -388,10 +388,11 @@ public final class ShotTour {
 
     private static void lookSteps(int y) {
         then(2, ShotTour::smwtiOn);
+        lookAt("rack", new Vec3(0.5, y + 1.0, -2.0), new Vec3(0.5, y + 0.5, 0.5));
+        lookAt("assembler", new Vec3(6.5, y + 1.2, -1.5), new Vec3(6.5, y + 0.5, 0.5));
+        lookAt("interface_node", new Vec3(9.5, y + 3.6, -1.5), new Vec3(9.5, y + 2.5, 0.5));
         lookAt("storage_bus_north", new Vec3(2.8, y + 1.5, -1.2), new Vec3(2.8, y + 1.5, 0.5));
-        lookAt("storage_bus_high", new Vec3(2.8, y + 1.85, -1.2), new Vec3(2.8, y + 1.85, 0.5));
         lookAt("import_node_east", new Vec3(11.0, y + 0.85, 0.5), new Vec3(9.5, y + 0.85, 0.5));
-        lookAt("import_node_north", new Vec3(9.5, y + 0.8, -1.2), new Vec3(9.5, y + 0.8, 0.5));
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
