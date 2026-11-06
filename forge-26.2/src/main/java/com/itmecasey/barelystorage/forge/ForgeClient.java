@@ -21,7 +21,9 @@ final class ForgeClient {
     private static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             MenuScreens.register(ModContent.RACK_MENU, RackScreen::new);
-            MenuScreens.register(ModContent.TERMINAL_MENU, TerminalScreen::new);
+            for (var type : ModContent.terminalMenus()) {
+                MenuScreens.register(type, TerminalScreen::new);
+            }
             MenuScreens.register(ModContent.PATTERN_MENU, PatternScreen::new);
             MenuScreens.register(ModContent.INTERFACE_MENU, NodeScreen::new);
             MenuScreens.register(ModContent.ASSEMBLER_MENU, NodeScreen::new);

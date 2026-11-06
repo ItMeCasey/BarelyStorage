@@ -16,18 +16,50 @@ final class Ui {
     static final FontDescription FONT = new FontDescription.Resource(ModContent.id("ui"));
     static final Style STYLE = Style.EMPTY.withFont(FONT);
     static final int NIGHT = 0xFF0F0E1A;
-    static final int PANEL = 0xFF1A1830;
-    static final int EDGE = 0xFF2E2A46;
+    static int PANEL = 0xFF1A1830;
+    static int EDGE = 0xFF2E2A46;
     static final int GOLD = 0xFFF2B33D;
     static final int GOLD_DARK = 0xFFB27420;
-    static final int TEXT = 0xFFF4F2FF;
-    static final int MUTED = 0xFFA9A4C8;
+    static int TEXT = 0xFFF4F2FF;
+    static int MUTED = 0xFFA9A4C8;
     static final int RED = 0xFFFF6B5E;
     static final int GREEN = 0xFF5BE38A;
     static final int BLUE = 0xFF7AA8FF;
-    static final int SLOT = 0xFF0B0A14;
+    static int SLOT = 0xFF0B0A14;
 
     private Ui() {
+    }
+
+    private static int titleColor = 0xFFF2B33D;
+    private static int highlight = 0xFF25223D;
+
+    /** Switches every screen between the dark and the light look. */
+    static void theme(boolean light) {
+        if (light) {
+            PANEL = 0xFFD8D8E4;
+            EDGE = 0xFF8C8CA6;
+            SLOT = 0xFFB4B4C6;
+            TEXT = 0xFF1A1830;
+            MUTED = 0xFF4A4A66;
+            titleColor = 0xFF8A5A10;
+            highlight = 0xFFEAEAF2;
+        } else {
+            PANEL = 0xFF1A1830;
+            EDGE = 0xFF2E2A46;
+            SLOT = 0xFF0B0A14;
+            TEXT = 0xFFF4F2FF;
+            MUTED = 0xFFA9A4C8;
+            titleColor = 0xFFF2B33D;
+            highlight = 0xFF25223D;
+        }
+    }
+
+    static int title() {
+        return titleColor;
+    }
+
+    static Component t(Component c, int rgb) {
+        return c.copy().withStyle(STYLE).withColor(rgb & 0xFFFFFF);
     }
 
     /** The component in the mod font. */
@@ -50,7 +82,7 @@ final class Ui {
     static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         g.fill(x, y, x + w, y + h, EDGE);
         g.fill(x + 1, y + 1, x + w - 1, y + h - 1, PANEL);
-        g.fill(x + 1, y + 1, x + w - 1, y + 2, 0xFF25223D);
+        g.fill(x + 1, y + 1, x + w - 1, y + 2, highlight);
         g.fill(x, y, x + 3, y + 1, GOLD);
         g.fill(x, y, x + 1, y + 3, GOLD);
     }

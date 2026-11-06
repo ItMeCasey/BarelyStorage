@@ -54,7 +54,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.GOLD);
+        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.title());
         boolean tall = menu.layout() == NodeMenu.Layout.INTERFACE;
         String area = switch (menu.layout()) {
             case ASSEMBLER -> "gui.barelystorage.crafting_patterns";

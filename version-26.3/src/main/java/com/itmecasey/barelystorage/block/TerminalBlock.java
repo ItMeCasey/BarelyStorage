@@ -3,7 +3,7 @@ package com.itmecasey.barelystorage.block;
 import com.itmecasey.barelystorage.NetNode;
 import com.itmecasey.barelystorage.StorageNetwork;
 import com.itmecasey.barelystorage.menu.PatternMenu;
-import com.itmecasey.barelystorage.menu.TerminalMenu;
+import com.itmecasey.barelystorage.menu.TerminalMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -71,8 +71,9 @@ public class TerminalBlock extends Block implements NetNode {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide()) {
             if (kind == Kind.STORAGE) {
-                player.openMenu(new SimpleMenuProvider((id, inv, p) -> new TerminalMenu(id, inv, level, pos),
-                        Component.translatable("block.barelystorage.storage_terminal")));
+                if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+                    TerminalMenus.open(sp, level, pos);
+                }
             } else {
                 player.openMenu(new SimpleMenuProvider((id, inv, p) -> new PatternMenu(id, inv, level, pos),
                         Component.translatable("block.barelystorage.pattern_terminal")));

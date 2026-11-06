@@ -67,7 +67,7 @@ public class RackScreen extends AbstractContainerScreen<RackMenu> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.GOLD);
+        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.title());
         Ui.text(g, font, Component.translatable("gui.barelystorage.drive_bays"), 8, 15, Ui.MUTED);
         Ui.text(g, font, Component.translatable("gui.barelystorage.blades"), 8, 45, Ui.MUTED);
         Ui.text(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);

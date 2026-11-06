@@ -20,7 +20,9 @@ public final class NeoForgeClient {
     @SubscribeEvent
     public static void screens(RegisterMenuScreensEvent event) {
         event.register(ModContent.RACK_MENU, RackScreen::new);
-        event.register(ModContent.TERMINAL_MENU, TerminalScreen::new);
+        for (var type : ModContent.terminalMenus()) {
+            event.register(type, TerminalScreen::new);
+        }
         event.register(ModContent.PATTERN_MENU, PatternScreen::new);
         event.register(ModContent.INTERFACE_MENU, NodeScreen::new);
         event.register(ModContent.ASSEMBLER_MENU, NodeScreen::new);

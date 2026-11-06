@@ -52,7 +52,7 @@ public final class ModContent {
     public static final BlockEntityType<ExportNodeBlockEntity> EXPORT;
     public static final BlockEntityType<AssemblerBlockEntity> ASSEMBLER;
     public static final MenuType<RackMenu> RACK_MENU = new MenuType<>(RackMenu::new, FeatureFlags.VANILLA_SET);
-    public static final MenuType<TerminalMenu> TERMINAL_MENU = new MenuType<>(TerminalMenu::new, FeatureFlags.VANILLA_SET);
+    private static final Map<Integer, MenuType<TerminalMenu>> TERMINAL_MENUS = new LinkedHashMap<>();
     public static final MenuType<PatternMenu> PATTERN_MENU = new MenuType<>(PatternMenu::new, FeatureFlags.VANILLA_SET);
     public static final MenuType<NodeMenu> INTERFACE_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.INTERFACE, id, inv), FeatureFlags.VANILLA_SET);
     public static final MenuType<NodeMenu> ASSEMBLER_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.ASSEMBLER, id, inv), FeatureFlags.VANILLA_SET);
@@ -61,6 +61,9 @@ public final class ModContent {
     public static final MenuType<NodeMenu> EXPORT_MENU = new MenuType<>((id, inv) -> NodeMenu.client(NodeMenu.Layout.EXPORT, id, inv), FeatureFlags.VANILLA_SET);
 
     static {
+        for (int rows : TerminalMenu.ROWS) {
+            TERMINAL_MENUS.put(rows, new MenuType<>((id, inv) -> new TerminalMenu(rows, id, inv), FeatureFlags.VANILLA_SET));
+        }
         RackBlock rack = new RackBlock(props("server_rack").mapColor(MapColor.METAL).strength(4.0F, 8.0F).sound(SoundType.METAL)
                 .requiresCorrectToolForDrops().lightLevel(s -> s.getValue(RackBlock.ONLINE) ? 6 : 0));
         block("server_rack", rack);
@@ -163,9 +166,17 @@ public final class ModContent {
         out.accept("assembler", ASSEMBLER);
     }
 
+    public static MenuType<TerminalMenu> terminalMenu(int rows) {
+        return TERMINAL_MENUS.get(rows);
+    }
+
+    public static java.util.Collection<MenuType<TerminalMenu>> terminalMenus() {
+        return TERMINAL_MENUS.values();
+    }
+
     public static void registerMenus(BiConsumer<String, MenuType<?>> out) {
         out.accept("server_rack", RACK_MENU);
-        out.accept("storage_terminal", TERMINAL_MENU);
+        TERMINAL_MENUS.forEach((rows, type) -> out.accept("storage_terminal_" + rows, type));
         out.accept("pattern_terminal", PATTERN_MENU);
         out.accept("interface_node", INTERFACE_MENU);
         out.accept("assembler", ASSEMBLER_MENU);

@@ -55,7 +55,7 @@ public class PatternScreen extends AbstractContainerScreen<PatternMenu> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.GOLD);
+        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.title());
         Ui.text(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
     }
 }
