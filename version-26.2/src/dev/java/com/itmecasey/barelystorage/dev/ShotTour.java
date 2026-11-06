@@ -58,6 +58,7 @@ public final class ShotTour {
     private static final boolean LOOK = "look".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean SCALES = "scales".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean JEI = "jei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean REI = "rei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -225,7 +226,7 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
-        if (JEI) {
+        if (JEI || REI) {
             jeiSteps(y);
             return;
         }
@@ -346,7 +347,7 @@ public final class ShotTour {
         then(10, () -> open(new BlockPos(5, y + 1, 0)));
         then(60, () -> {
             try {
-                Class.forName("com.itmecasey.barelystorage.neoforge.dev.JeiProbe").getMethod("run", net.minecraft.client.gui.screens.Screen.class).invoke(null, Minecraft.getInstance().gui.screen());
+                Class.forName("com.itmecasey.barelystorage.neoforge.dev." + (REI ? "ReiProbe" : "JeiProbe")).getMethod("run", net.minecraft.client.gui.screens.Screen.class).invoke(null, Minecraft.getInstance().gui.screen());
             } catch (ReflectiveOperationException e) {
                 LOGGER.error("BARELYSTORAGE-SHOTS jei probe failed", e);
             }
@@ -361,7 +362,7 @@ public final class ShotTour {
                 LOGGER.info("BARELYSTORAGE-SHOTS jei grid after transfer: {}", sb);
             }
         }));
-        shoot("jei_grid_after_transfer", 5);
+        shoot((REI ? "rei" : "jei") + "_grid_after_transfer", 5);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
