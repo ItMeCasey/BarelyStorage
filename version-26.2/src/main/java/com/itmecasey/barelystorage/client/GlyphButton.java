@@ -24,7 +24,7 @@ final class GlyphButton extends AbstractWidget {
     private Component lastTip;
 
     GlyphButton(int x, int y, Supplier<String> icon, Runnable action, Supplier<Component> tip) {
-        this(x, y, 16, icon, action, tip, () -> false);
+        this(x, y, 12, icon, action, tip, () -> false);
     }
 
     GlyphButton(int x, int y, int size, Supplier<String> icon, Runnable action, Supplier<Component> tip, BooleanSupplier lit) {
@@ -42,12 +42,12 @@ final class GlyphButton extends AbstractWidget {
     }
 
     static int iconPixels() {
-        return 12 * Math.max(1, Math.min(5, (int) Math.round(net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale())));
+        return 9 * Math.max(1, Math.min(5, (int) Math.round(net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale())));
     }
 
     static void drawIcon(GuiGraphicsExtractor g, String name, int x, int y, int tint) {
         int px = iconPixels();
-        g.blit(RenderPipelines.GUI_TEXTURED, iconId(name), x, y, 0.0F, 0.0F, 12, 12, px, px, px, px, tint);
+        g.blit(RenderPipelines.GUI_TEXTURED, iconId(name), x, y, 0.0F, 0.0F, 9, 9, px, px, px, px, tint);
     }
 
     @Override
@@ -65,7 +65,7 @@ final class GlyphButton extends AbstractWidget {
         g.fill(x, y, x + width, y + height, border);
         g.fill(x + 1, y + 1, x + width - 1, y + height - 1, hover ? Ui.PANEL : Ui.SLOT);
         int tint = hover || on ? Ui.GOLD : Ui.TEXT;
-        drawIcon(g, icon.get(), x + (width - 12) / 2, y + (height - 12) / 2, tint);
+        drawIcon(g, icon.get(), x + (width - 9) / 2, y + (height - 9) / 2, tint);
         Component now = tip.get();
         if (!now.equals(lastTip)) {
             lastTip = now;

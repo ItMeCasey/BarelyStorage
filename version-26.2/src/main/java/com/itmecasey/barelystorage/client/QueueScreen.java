@@ -27,7 +27,7 @@ public class QueueScreen extends AbstractContainerScreen<QueueMenu> {
         cancels.clear();
         for (int i = 0; i < QueueMenu.JOBS; i++) {
             final int job = i;
-            GlyphButton b = new GlyphButton(leftPos + 154, topPos + 31 + i * 20, 16, () -> "cancel", () -> {
+            GlyphButton b = new GlyphButton(leftPos + 154, topPos + 31 + i * 20, 12, () -> "cancel", () -> {
                 if (minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, job);
                 }
@@ -79,7 +79,7 @@ public class QueueScreen extends AbstractContainerScreen<QueueMenu> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.title());
-        Ui.text(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
+        Ui.label(g, font, title, titleLabelX, titleLabelY, Ui.title());
+        Ui.label(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
     }
 }

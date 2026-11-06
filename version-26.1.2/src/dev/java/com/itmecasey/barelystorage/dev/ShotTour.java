@@ -56,6 +56,7 @@ public final class ShotTour {
     private static final boolean BEI = "bei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean SEARCH = "search".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean LOOK = "look".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean SCALES = "scales".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -223,6 +224,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (SCALES) {
+            scaleSteps(y);
+            return;
+        }
         if (LOOK) {
             lookSteps(y);
             return;
@@ -322,6 +327,32 @@ public final class ShotTour {
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
         then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    private static void scaleSteps(int y) {
+        then(30, () -> moveTo(new Vec3(4.5, y + 1.0, -2.0), new Vec3(4.5, y + 0.5, 0.5)));
+        then(10, () -> open(new BlockPos(4, y, 0)));
+        for (int sc : new int[] {1, 2, 4}) {
+            then(10, () -> {
+                Minecraft minecraft = Minecraft.getInstance();
+                var window = minecraft.getWindow();
+                window.setGuiScale(window.calculateScale(sc, minecraft.isEnforceUnicode()));
+                if (minecraft.screen != null) {
+                    minecraft.screen.resize(window.getGuiScaledWidth(), window.getGuiScaledHeight());
+                }
+            });
+            shoot("scale_" + sc + "_pattern_terminal", 30);
+        }
+        then(2, () -> close());
+        then(10, () -> open(new BlockPos(9, y + 2, 0)));
+        shoot("scale_4_interface", 30);
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.options.pauseOnLostFocus = pauseOnLostFocus;

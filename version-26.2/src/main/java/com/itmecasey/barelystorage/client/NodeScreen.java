@@ -23,7 +23,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
     protected void init() {
         super.init();
         if (menu.layout() == NodeMenu.Layout.BUS) {
-            addRenderableWidget(new GlyphButton(leftPos + 156, topPos + 4, 16, () -> "priority_" + menu.priority(), () -> {
+            addRenderableWidget(new GlyphButton(leftPos + 156, topPos + 4, 12, () -> "priority_" + menu.priority(), () -> {
                 if (minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, NodeMenu.BTN_PRIORITY);
                 }
@@ -44,7 +44,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
             } else {
                 Ui.slot(g, leftPos + s.x, topPos + s.y);
                 if (s.index < NodeMenu.UPGRADES && !s.hasItem()) {
-                    GlyphButton.drawIcon(g, "upgrade_hint", leftPos + s.x + 2, topPos + s.y + 2, 0x66C8C8D8);
+                    GlyphButton.drawIcon(g, "upgrade_hint", leftPos + s.x + 3, topPos + s.y + 3, 0x66C8C8D8);
                 }
             }
         }
@@ -52,7 +52,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mx, int my) {
-        Ui.text(g, font, title, titleLabelX, titleLabelY, Ui.title());
+        Ui.label(g, font, title, titleLabelX, titleLabelY, Ui.title());
         boolean tall = menu.layout() == NodeMenu.Layout.INTERFACE;
         String area = switch (menu.layout()) {
             case ASSEMBLER -> "gui.barelystorage.crafting_patterns";
@@ -61,10 +61,10 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
             case IMPORT -> "gui.barelystorage.import_filter";
             case BUS -> "gui.barelystorage.bus_filter";
         };
-        Ui.text(g, font, Component.translatable(area), menu.areaX, menu.areaY - 10, Ui.MUTED);
+        Ui.label(g, font, Component.translatable(area), menu.areaX, menu.areaY - 10, Ui.MUTED);
         if (tall) {
-            Ui.text(g, font, Component.translatable("gui.barelystorage.buffer"), menu.bufferX, menu.bufferY - 10, Ui.MUTED);
+            Ui.label(g, font, Component.translatable("gui.barelystorage.buffer"), menu.bufferX, menu.bufferY - 10, Ui.MUTED);
         }
-        Ui.text(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
+        Ui.label(g, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Ui.MUTED);
     }
 }

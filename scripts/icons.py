@@ -49,9 +49,9 @@ SCALES = (1, 2, 3, 4, 5)
 
 
 def save(im, folder, name):
-    """One sprite per GUI scale: 12 * scale pixels square, so each texture pixel lands on one screen pixel (crisp, never stretched)."""
+    """One sprite per GUI scale: 9 * scale pixels square, so each texture pixel lands on one screen pixel (crisp, never stretched)."""
     for sc in SCALES:
-        im.resize((N * sc, N * sc), Image.LANCZOS).save(os.path.join(folder, f"{name}_s{sc}.png"))
+        im.resize((9 * sc, 9 * sc), Image.LANCZOS).save(os.path.join(folder, f"{name}_s{sc}.png"))
 
 
 def height(n):

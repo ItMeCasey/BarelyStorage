@@ -15,6 +15,9 @@ import net.minecraft.world.inventory.Slot;
 final class Ui {
     static final FontDescription FONT = new FontDescription.Resource(ModContent.id("ui"));
     static final Style STYLE = Style.EMPTY.withFont(FONT);
+    /** Silkscreen (SIL Open Font License): the pixel font for titles, labels and buttons; numbers and names stay in the UI font. */
+    static final FontDescription FONT_SILK = new FontDescription.Resource(ModContent.id("silk"));
+    static final Style STYLE_SILK = Style.EMPTY.withFont(FONT_SILK);
     static final int NIGHT = 0xFF0F0E1A;
     static int PANEL = 0xFF1A1830;
     static int EDGE = 0xFF2E2A46;
@@ -69,6 +72,11 @@ final class Ui {
 
     static Component t(String s) {
         return Component.literal(s).withStyle(STYLE);
+    }
+
+    /** A title or label in the pixel font. */
+    static void label(GuiGraphicsExtractor g, Font font, Component c, int x, int y, int color) {
+        g.text(font, c.copy().withStyle(STYLE_SILK), x, y, color, false);
     }
 
     static void text(GuiGraphicsExtractor g, Font font, Component c, int x, int y, int color) {
