@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IGI",
+    "RBR",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glass_pane",
+    "R": "minecraft:redstone",
+    "B": "barelystorage:rack_bus_cable"
+  },
+  "result": {
+    "id": "barelystorage:storage_terminal",
+    "count": 1
+  }
+}

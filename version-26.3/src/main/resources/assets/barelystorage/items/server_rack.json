@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "barelystorage:block/server_rack_off"
+  }
+}

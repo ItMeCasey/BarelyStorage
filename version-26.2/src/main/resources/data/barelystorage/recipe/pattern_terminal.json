@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "barelystorage:storage_terminal",
+    "minecraft:crafting_table",
+    "barelystorage:blank_pattern"
+  ],
+  "result": {
+    "id": "barelystorage:pattern_terminal",
+    "count": 1
+  }
+}

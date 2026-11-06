@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LQL",
+    "QCQ",
+    "LQL"
+  ],
+  "key": {
+    "L": "minecraft:lapis_lazuli",
+    "Q": "minecraft:quartz",
+    "C": "barelystorage:basic_core"
+  },
+  "result": {
+    "id": "barelystorage:ram_blade",
+    "count": 1
+  }
+}

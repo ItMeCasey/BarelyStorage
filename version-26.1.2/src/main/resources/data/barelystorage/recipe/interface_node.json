@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "IDI",
+    " R "
+  ],
+  "key": {
+    "C": "barelystorage:rack_bus_cable",
+    "I": "minecraft:iron_ingot",
+    "D": "minecraft:dropper",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "barelystorage:interface_node",
+    "count": 1
+  }
+}

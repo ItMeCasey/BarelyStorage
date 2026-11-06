@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "barelystorage:block/storage_bus"
+  }
+}

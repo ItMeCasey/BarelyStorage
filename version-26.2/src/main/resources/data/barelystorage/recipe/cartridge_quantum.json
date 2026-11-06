@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DED",
+    "ECE",
+    "DED"
+  ],
+  "key": {
+    "D": "minecraft:diamond_block",
+    "E": "minecraft:ender_eye",
+    "C": "barelystorage:cartridge_obsidian"
+  },
+  "result": {
+    "id": "barelystorage:cartridge_quantum",
+    "count": 1
+  }
+}

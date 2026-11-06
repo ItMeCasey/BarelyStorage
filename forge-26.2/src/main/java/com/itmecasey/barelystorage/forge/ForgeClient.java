@@ -1,0 +1,30 @@
+package com.itmecasey.barelystorage.forge;
+
+import com.itmecasey.barelystorage.ModContent;
+import com.itmecasey.barelystorage.client.GridScreen;
+import com.itmecasey.barelystorage.client.PatternScreen;
+import com.itmecasey.barelystorage.client.RackScreen;
+import com.itmecasey.barelystorage.client.TerminalScreen;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
+/** Client-only setup: the screens. The event only fires on a client. */
+final class ForgeClient {
+    private ForgeClient() {
+    }
+
+    static void install(FMLJavaModLoadingContext context) {
+        FMLClientSetupEvent.getBus(context.getModBusGroup()).addListener(ForgeClient::setup);
+    }
+
+    private static void setup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            MenuScreens.register(ModContent.RACK_MENU, RackScreen::new);
+            MenuScreens.register(ModContent.TERMINAL_MENU, TerminalScreen::new);
+            MenuScreens.register(ModContent.PATTERN_MENU, PatternScreen::new);
+            MenuScreens.register(ModContent.INTERFACE_MENU, GridScreen::new);
+            MenuScreens.register(ModContent.ASSEMBLER_MENU, GridScreen::new);
+        });
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "barelystorage:rack_bus_cable"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "barelystorage:blocks/rack_bus_cable"
+}

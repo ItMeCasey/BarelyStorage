@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "barelystorage:block/import_node"
+    },
+    "facing=east": {
+      "model": "barelystorage:block/import_node",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "barelystorage:block/import_node",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "barelystorage:block/import_node",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "barelystorage:block/import_node",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "barelystorage:block/import_node",
+      "x": 90
+    }
+  }
+}

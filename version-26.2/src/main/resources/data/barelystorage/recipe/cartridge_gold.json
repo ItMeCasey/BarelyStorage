@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GXG",
+    "XCX",
+    "GXG"
+  ],
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "X": "minecraft:redstone_block",
+    "C": "barelystorage:cartridge_steel"
+  },
+  "result": {
+    "id": "barelystorage:cartridge_gold",
+    "count": 1
+  }
+}

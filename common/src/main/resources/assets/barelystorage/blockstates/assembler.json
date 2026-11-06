@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "barelystorage:block/assembler_idle"
+    },
+    "active=true": {
+      "model": "barelystorage:block/assembler_active"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "barelystorage:block/assembler_front_active",
+    "south": "barelystorage:block/assembler_side",
+    "east": "barelystorage:block/assembler_side",
+    "west": "barelystorage:block/assembler_side",
+    "up": "barelystorage:block/assembler_top",
+    "down": "barelystorage:block/assembler_top",
+    "particle": "barelystorage:block/assembler_side"
+  }
+}

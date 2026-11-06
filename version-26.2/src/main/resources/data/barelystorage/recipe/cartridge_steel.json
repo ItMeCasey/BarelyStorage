@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IXI",
+    "XCX",
+    "IXI"
+  ],
+  "key": {
+    "I": "minecraft:iron_block",
+    "X": "minecraft:redstone",
+    "C": "barelystorage:cartridge_iron"
+  },
+  "result": {
+    "id": "barelystorage:cartridge_steel",
+    "count": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "barelystorage:server_rack",
+    "barelystorage:rack_bus_cable",
+    "barelystorage:storage_bus",
+    "barelystorage:interface_node",
+    "barelystorage:import_node",
+    "barelystorage:storage_terminal",
+    "barelystorage:pattern_terminal",
+    "barelystorage:assembler"
+  ]
+}
