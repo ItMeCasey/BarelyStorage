@@ -40,6 +40,11 @@ def main():
         dst = os.path.join(ROOT, f"version-{v}", "src", "main", "java")
         shutil.rmtree(dst, ignore_errors=True)
         copy_tree(master, dst, strip_codec if v == "26.3" else None)
+        dev = os.path.join(ROOT, "version-26.1.2", "src", "dev", "java")
+        if os.path.isdir(dev):
+            ddst = os.path.join(ROOT, f"version-{v}", "src", "dev", "java")
+            shutil.rmtree(ddst, ignore_errors=True)
+            copy_tree(dev, ddst)
     for loader in ("neoforge", "forge"):
         src = os.path.join(ROOT, f"{loader}-26.1.2", "src")
         if not os.path.isdir(src):

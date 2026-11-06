@@ -1,0 +1,301 @@
+package com.itmecasey.barelystorage.dev;
+
+import com.itmecasey.barelystorage.CraftScheduler;
+import com.itmecasey.barelystorage.Dev;
+import com.itmecasey.barelystorage.ItemKey;
+import com.itmecasey.barelystorage.Keys;
+import com.itmecasey.barelystorage.ModContent;
+import com.itmecasey.barelystorage.Pattern;
+import com.itmecasey.barelystorage.Settings;
+import com.itmecasey.barelystorage.StorageNetwork;
+import com.itmecasey.barelystorage.block.AssemblerBlockEntity;
+import com.itmecasey.barelystorage.block.ImportNodeBlockEntity;
+import com.itmecasey.barelystorage.block.InterfaceNodeBlockEntity;
+import com.itmecasey.barelystorage.block.NodeBlock;
+import com.itmecasey.barelystorage.block.RackBlock;
+import com.itmecasey.barelystorage.block.RackBlockEntity;
+import com.itmecasey.barelystorage.block.StorageBusBlockEntity;
+import com.itmecasey.barelystorage.item.CartridgeItem;
+import com.itmecasey.barelystorage.item.PatternItem;
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Headless check of the whole network: power, storage, persistence, linking racks, Storage Bus, Interface and Import nodes with a
+ * real furnace, crafting through an Assembler, and the Thread Exhaustion / Out of Memory halt. Runs once at server start when
+ * {@code BARELYSTORAGE_SELFTEST} is set and prints {@code SELFTEST PASS/FAIL} lines ending in {@code SELFTEST DONE failures=N}.
+ * It ticks the block entities by hand, so it needs no running game loop.
+ */
+public final class SelfTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger("BarelyStorage");
+    private static ServerLevel level;
+    private static int failures;
+
+    private SelfTest() {
+    }
+
+    public static boolean requested() {
+        return System.getenv("BARELYSTORAGE_SELFTEST") != null && Dev.ENABLED;
+    }
+
+    public static int run(MinecraftServer server) {
+        level = server.overworld();
+        failures = 0;
+        BlockPos spawn = level.getRespawnData().pos();
+        int x = spawn.getX() + 3;
+        int z = spawn.getZ() + 3;
+        int y = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) + 25;
+        try {
+            powerAndStorage(new BlockPos(x, y, z));
+            twoRacks(new BlockPos(x, y, z + 6));
+            storageBus(new BlockPos(x, y, z + 12));
+            furnaceProcessing(new BlockPos(x, y + 6, z));
+            craftingAndHalt(new BlockPos(x, y + 6, z + 8));
+        } catch (RuntimeException e) {
+            LOGGER.error("SELFTEST error", e);
+            verdict("selftest_ran_clean", false, e.toString());
+        }
+        LOGGER.info("SELFTEST DONE failures={}", failures);
+        return failures;
+    }
+
+    // ---- helpers ----
+
+    private static void place(BlockPos pos, String block) {
+        level.setBlock(pos, ModContent.blocks().get(block).defaultBlockState(), 3);
+    }
+
+    private static void placeNode(BlockPos pos, String block, Direction facing) {
+        level.setBlock(pos, ModContent.blocks().get(block).defaultBlockState().setValue(NodeBlock.FACING, facing), 3);
+    }
+
+    private static RackBlockEntity rack(BlockPos pos) {
+        place(pos, "server_rack");
+        return (RackBlockEntity) level.getBlockEntity(pos);
+    }
+
+    private static void tick(RackBlockEntity r) {
+        RackBlockEntity.serverTick(level, r.getBlockPos(), level.getBlockState(r.getBlockPos()), r);
+    }
+
+    private static ItemKey key(net.minecraft.world.item.Item item) {
+        return Keys.of(new ItemStack(item), level.registryAccess());
+    }
+
+    private static StorageNetwork net(BlockPos pos) {
+        return StorageNetwork.find(level, pos);
+    }
+
+    private static void clear(BlockPos from, BlockPos to) {
+        for (BlockPos p : BlockPos.betweenClosed(from, to)) {
+            level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);
+        }
+    }
+
+    private static void verdict(String name, boolean ok, String detail) {
+        if (ok) {
+            LOGGER.info("SELFTEST PASS {} ({})", name, detail);
+        } else {
+            failures++;
+            LOGGER.error("SELFTEST FAIL {} ({})", name, detail);
+        }
+    }
+
+    private static ItemStack cart(String id) {
+        return new ItemStack(ModContent.item(id));
+    }
+
+    // ---- tests ----
+
+    private static void powerAndStorage(BlockPos p) {
+        clear(p.offset(-1, -1, -1), p.offset(2, 1, 1));
+        RackBlockEntity r = rack(p);
+        r.drives.setItem(0, cart("cartridge_iron"));
+        tick(r);
+        verdict("rack_without_power_is_offline", !r.online() && !net(p).online(), "online=" + r.online());
+        ItemStack rest = net(p).insert(new ItemStack(Items.COBBLESTONE, 10));
+        verdict("offline_network_stores_nothing", rest.getCount() == 10, "rest=" + rest.getCount());
+        r.setEnergy(r.maxEnergy());
+        tick(r);
+        verdict("rack_with_power_goes_online", r.online() && level.getBlockState(p).getValue(RackBlock.ONLINE), "energy=" + r.energy());
+        ItemStack left = net(p).insert(new ItemStack(Items.COBBLESTONE, 64));
+        verdict("insert_into_cartridge", left.isEmpty() && net(p).pool().count(key(Items.COBBLESTONE)) == 64, "count=" + net(p).pool().count(key(Items.COBBLESTONE)));
+        ItemStack out = net(p).extract(key(Items.COBBLESTONE), 32);
+        ItemStack drive = r.drives.getItem(0);
+        long inItem = CartridgeItem.read(drive, ((CartridgeItem) drive.getItem()).tier()).count(key(Items.COBBLESTONE));
+        verdict("extract_updates_cartridge_item", out.getCount() == 32 && inItem == 32, "out=" + out.getCount() + " item=" + inItem);
+        int before = r.energy();
+        for (int i = 0; i < 20; i++) {
+            tick(r);
+        }
+        verdict("rack_uses_power_each_tick", r.energy() == before - 20 * r.upkeep(), "used=" + (before - r.energy()) + " upkeep=" + r.upkeep());
+        CompoundTag saved = r.saveWithoutMetadata(level.registryAccess());
+        RackBlockEntity copy = new RackBlockEntity(p, level.getBlockState(p));
+        copy.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), saved));
+        verdict("rack_survives_saving_and_loading", copy.energy() == r.energy() && copy.cart(0) != null && copy.cart(0).count(key(Items.COBBLESTONE)) == 32,
+                "energy=" + copy.energy() + " cobble=" + (copy.cart(0) == null ? -1 : copy.cart(0).count(key(Items.COBBLESTONE))));
+        r.setEnergy(0);
+        tick(r);
+        verdict("power_loss_takes_network_offline", !r.online() && !net(p).online() && net(p).insert(new ItemStack(Items.DIRT, 5)).getCount() == 5, "online=" + r.online());
+        clear(p.offset(-1, -1, -1), p.offset(2, 1, 1));
+    }
+
+    private static void twoRacks(BlockPos p) {
+        clear(p.offset(-1, -1, -1), p.offset(4, 1, 1));
+        RackBlockEntity a = rack(p);
+        place(p.east(), "rack_bus_cable");
+        RackBlockEntity b = rack(p.east(2));
+        a.drives.setItem(0, cart("cartridge_iron"));
+        b.drives.setItem(0, cart("cartridge_iron"));
+        a.setEnergy(a.maxEnergy());
+        b.setEnergy(b.maxEnergy());
+        tick(a);
+        tick(b);
+        StorageNetwork n = net(p);
+        verdict("bus_cable_links_two_racks", n.racks.size() == 2 && net(p.east(2)).racks.size() == 2, "racks=" + n.racks.size());
+        ItemStack rest = net(p).insert(new ItemStack(Items.IRON_INGOT, 64));
+        for (int i = 0; i < 130; i++) {
+            rest = net(p).insert(new ItemStack(Items.IRON_INGOT, 64));
+        }
+        long total = a.used() + b.used();
+        verdict("items_spread_over_linked_racks", total == 131 * 64 && net(p).pool().count(key(Items.IRON_INGOT)) == total, "used=" + total);
+        b.setEnergy(0);
+        tick(b);
+        verdict("unpowered_rack_hides_its_drives", net(p).pool().count(key(Items.IRON_INGOT)) == a.used(), "visible=" + net(p).pool().count(key(Items.IRON_INGOT)));
+        clear(p.offset(-1, -1, -1), p.offset(4, 1, 1));
+    }
+
+    private static void storageBus(BlockPos p) {
+        clear(p.offset(-1, -1, -1), p.offset(5, 1, 1));
+        RackBlockEntity r = rack(p);
+        r.drives.setItem(0, cart("cartridge_iron"));
+        r.setEnergy(r.maxEnergy());
+        tick(r);
+        place(p.east(), "rack_bus_cable");
+        placeNode(p.east(2), "storage_bus", Direction.EAST);
+        level.setBlock(p.east(3), Blocks.CHEST.defaultBlockState(), 3);
+        ChestBlockEntity chest = (ChestBlockEntity) level.getBlockEntity(p.east(3));
+        chest.setItem(0, new ItemStack(Items.DIAMOND, 10));
+        StorageBusBlockEntity bus = (StorageBusBlockEntity) level.getBlockEntity(p.east(2));
+        long seen = net(p).pool().count(key(Items.DIAMOND));
+        verdict("storage_bus_maps_chest_contents", seen == 10, "diamonds=" + seen);
+        ItemStack took = net(p).extract(key(Items.DIAMOND), 3);
+        verdict("extract_through_bus_leaves_chest_updated", took.getCount() == 3 && chest.countItem(Items.DIAMOND) == 7, "chest=" + chest.countItem(Items.DIAMOND));
+        bus.cyclePriority();
+        bus.cyclePriority();
+        net(p).insert(new ItemStack(Items.DIRT, 5));
+        verdict("high_priority_bus_receives_first", chest.countItem(Items.DIRT) == 5, "dirt in chest=" + chest.countItem(Items.DIRT));
+        clear(p.offset(-1, -1, -1), p.offset(5, 1, 1));
+    }
+
+    private static Pattern pattern(Pattern.Kind kind, ItemStack out, ItemStack... in) {
+        List<Pattern.Stack> inputs = new java.util.ArrayList<>();
+        for (ItemStack s : in) {
+            inputs.add(new Pattern.Stack(Keys.of(s, level.registryAccess()), s.getCount()));
+        }
+        return new Pattern(kind, inputs, List.of(new Pattern.Stack(Keys.of(out, level.registryAccess()), out.getCount())));
+    }
+
+    private static ItemStack encoded(Pattern p) {
+        ItemStack s = new ItemStack(ModContent.item(p.kind() == Pattern.Kind.CRAFTING ? "crafting_pattern" : "processing_pattern"));
+        PatternItem.write(s, p);
+        return s;
+    }
+
+    private static void furnaceProcessing(BlockPos p) {
+        // Rack (0), cable column at x+1 from y-1 to y+1, furnace at x+2, Interface above it, Import below it, Assembler at z+1.
+        clear(p.offset(-1, -2, -1), p.offset(4, 2, 2));
+        RackBlockEntity r = rack(p);
+        r.blades.setItem(0, new ItemStack(ModContent.item("basic_core")));
+        r.drives.setItem(0, cart("cartridge_iron"));
+        r.setEnergy(r.maxEnergy());
+        for (int dy = -1; dy <= 1; dy++) {
+            place(p.east().above(dy), "rack_bus_cable");
+        }
+        level.setBlock(p.east(2), Blocks.FURNACE.defaultBlockState(), 3);
+        placeNode(p.east(2).above(), "interface_node", Direction.DOWN);
+        placeNode(p.east(2).below(), "import_node", Direction.UP);
+        place(p.east().south(), "assembler");
+        AssemblerBlockEntity asm = (AssemblerBlockEntity) level.getBlockEntity(p.east().south());
+        asm.patterns.setItem(0, encoded(pattern(Pattern.Kind.PROCESSING, new ItemStack(Items.IRON_INGOT), new ItemStack(Items.RAW_IRON))));
+        FurnaceBlockEntity furnace = (FurnaceBlockEntity) level.getBlockEntity(p.east(2));
+        furnace.setItem(1, new ItemStack(Items.COAL, 1));
+        InterfaceNodeBlockEntity iface = (InterfaceNodeBlockEntity) level.getBlockEntity(p.east(2).above());
+        ImportNodeBlockEntity imp = (ImportNodeBlockEntity) level.getBlockEntity(p.east(2).below());
+        tick(r);
+        net(p).insert(new ItemStack(Items.RAW_IRON, 3));
+        var plan = net(p).requestCraft(key(Items.IRON_INGOT), 2);
+        verdict("processing_job_is_planned", plan.ok(), plan.message);
+        for (int i = 0; i < 1500 && !r.scheduler().jobs().isEmpty(); i++) {
+            tick(r);
+            InterfaceNodeBlockEntity.serverTick(level, iface.getBlockPos(), level.getBlockState(iface.getBlockPos()), iface);
+            ImportNodeBlockEntity.serverTick(level, imp.getBlockPos(), level.getBlockState(imp.getBlockPos()), imp);
+            AssemblerBlockEntity.serverTick(level, asm.getBlockPos(), level.getBlockState(asm.getBlockPos()), asm);
+            AbstractFurnaceBlockEntity.serverTick(level, furnace.getBlockPos(), level.getBlockState(furnace.getBlockPos()), furnace);
+        }
+        long ingots = net(p).pool().count(key(Items.IRON_INGOT));
+        verdict("interface_feeds_furnace_and_import_returns_products", ingots == 2 && r.scheduler().jobs().isEmpty(),
+                "ingots=" + ingots + " jobs=" + r.scheduler().jobs().size() + " raw=" + net(p).pool().count(key(Items.RAW_IRON))
+                        + " furnace=[" + furnace.getItem(0) + "," + furnace.getItem(1) + "," + furnace.getItem(2) + "] buffer=" + iface.buffer.getItem(0)
+                        + " steps=" + (r.scheduler().jobs().isEmpty() ? "-" : r.scheduler().jobs().get(0).steps.get(0).pending + "/" + r.scheduler().jobs().get(0).steps.get(0).active)
+                        + " err=" + r.scheduler().lastError());
+        clear(p.offset(-1, -2, -1), p.offset(4, 2, 2));
+    }
+
+    private static void craftingAndHalt(BlockPos p) {
+        clear(p.offset(-1, -1, -1), p.offset(3, 1, 2));
+        RackBlockEntity r = rack(p);
+        r.blades.setItem(0, new ItemStack(ModContent.item("basic_core")));
+        r.drives.setItem(0, cart("cartridge_iron"));
+        r.setEnergy(r.maxEnergy());
+        place(p.east(), "assembler");
+        AssemblerBlockEntity asm = (AssemblerBlockEntity) level.getBlockEntity(p.east());
+        asm.patterns.setItem(0, encoded(pattern(Pattern.Kind.CRAFTING, new ItemStack(Items.OAK_PLANKS, 4), new ItemStack(Items.OAK_LOG))));
+        asm.patterns.setItem(1, encoded(pattern(Pattern.Kind.CRAFTING, new ItemStack(Items.STICK, 4), new ItemStack(Items.OAK_PLANKS, 2))));
+        tick(r);
+        net(p).insert(new ItemStack(Items.OAK_LOG, 1));
+        var plan = net(p).requestCraft(key(Items.STICK), 4);
+        verdict("chain_job_is_planned", plan.depth == 2 && plan.steps.size() == 2, "depth=" + plan.depth + " " + plan.message);
+        verdict("basic_core_halts_deep_chain_with_thread_exhaustion",
+                r.scheduler().halted() && r.scheduler().lastError().startsWith("Thread Exhaustion") && r.log().stream().anyMatch(l -> l.startsWith("Thread Exhaustion")),
+                r.scheduler().lastError());
+        for (int i = 0; i < 40; i++) {
+            tick(r);
+            AssemblerBlockEntity.serverTick(level, asm.getBlockPos(), level.getBlockState(asm.getBlockPos()), asm);
+        }
+        verdict("halted_queue_makes_no_progress", net(p).pool().count(key(Items.STICK)) == 0 && net(p).pool().count(key(Items.OAK_LOG)) == 1, "sticks=" + net(p).pool().count(key(Items.STICK)));
+        r.blades.setItem(1, new ItemStack(ModContent.item("ram_blade")));
+        for (int i = 0; i < 400 && !r.scheduler().jobs().isEmpty(); i++) {
+            tick(r);
+            AssemblerBlockEntity.serverTick(level, asm.getBlockPos(), level.getBlockState(asm.getBlockPos()), asm);
+        }
+        long sticks = net(p).pool().count(key(Items.STICK));
+        long planks = net(p).pool().count(key(Items.OAK_PLANKS));
+        verdict("installing_a_ram_blade_resumes_and_finishes", sticks == 4 && planks == 2 && r.scheduler().jobs().isEmpty() && r.scheduler().lastError().isEmpty(),
+                "sticks=" + sticks + " planks=" + planks + " jobs=" + r.scheduler().jobs().size());
+        Settings.set("hardware.basic_core.ram", 1);
+        Settings.set("hardware.ram_blade.ram", 1);
+        net(p).insert(new ItemStack(Items.OAK_LOG, 1));
+        r.scheduler().setHardware(net(p).hardware(), net(p));
+        net(p).requestCraft(key(Items.OAK_PLANKS), 4);
+        verdict("too_little_ram_halts_with_out_of_memory", r.scheduler().halted() && r.scheduler().lastError().startsWith("Out of Memory"), r.scheduler().lastError());
+        Settings.reset();
+        r.scheduler().setHardware(net(p).hardware(), net(p));
+        verdict("restoring_ram_clears_the_halt", !r.scheduler().halted(), r.scheduler().lastError());
+        clear(p.offset(-1, -1, -1), p.offset(3, 1, 2));
+    }
+}
