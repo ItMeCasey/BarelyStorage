@@ -35,7 +35,7 @@ Power use, drive sizes, hardware, crafting speed and node speed are all in `conf
 
 The pictures on this page are illustrations drawn for the listing, not game screenshots.
 
-**Tested:** every layer (Forge and NeoForge on 26.1.2, 26.2 and 26.3) compiles and passes a headless server self test of 33 checks (storage, priority routing, nodes, filters, patterns and crafting, hardware halts, terminal clicks, power) plus 32 unit tests of the shared logic. Each layer was run in a real client with a scripted tour that photographs the room and every screen. The BEI plus button and the BEI search sync were checked in a real client on NeoForge 26.2 only. The JEI and REI plus buttons were run in a real client on NeoForge 26.2 (the Bread recipe fills the Crafting Terminal grid). The Show Me What This Is lines, taking items out through the terminal in a real client, multiplayer and long play sessions have not been checked yet.
+**Tested:** every layer (Forge and NeoForge on 26.1.2, 26.2 and 26.3) compiles and passes a headless server self test of 34 checks (storage, priority routing, nodes, filters, patterns and crafting, hardware halts, terminal clicks, power) plus 32 unit tests of the shared logic. Each layer was run in a real client with a scripted tour that photographs the room and every screen. The BEI plus button and the BEI search sync were checked in a real client on NeoForge 26.2 only. The JEI and REI plus buttons were run in a real client on NeoForge 26.2 (the Bread recipe fills the Crafting Terminal grid). The Show Me What This Is lines, taking items out through the terminal in a real client, multiplayer and long play sessions have not been checked yet.
 
 # FAQ
 

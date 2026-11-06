@@ -69,6 +69,7 @@ public final class SelfTest {
             filtersAndUpgrades(new BlockPos(x, y + 12, z));
             terminalClicks(new BlockPos(x, y + 18, z));
             efficiency(new BlockPos(x, y + 24, z));
+            occlusion();
         } catch (RuntimeException e) {
             LOGGER.error("SELFTEST error", e);
             verdict("selftest_ran_clean", false, e.toString());
@@ -307,6 +308,19 @@ public final class SelfTest {
         verdict("taken_items_are_gone_from_the_cartridge_item_and_the_list", inItem == afterClick && shownNow == afterClick,
                 "item=" + inItem + " pool=" + afterClick + " listShows=" + shownNow);
         clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+    }
+
+    private static void occlusion() {
+        StringBuilder bad = new StringBuilder();
+        for (String name : new String[] {"server_rack", "storage_terminal", "crafting_terminal", "queue_terminal", "pattern_terminal", "assembler", "rack_bus_cable",
+                "storage_bus", "interface_node", "import_node", "export_node"}) {
+            var state = ModContent.blocks().get(name).defaultBlockState();
+            boolean full = state.canOcclude() && net.minecraft.world.level.block.Block.isShapeFullBlock(state.getOcclusionShape());
+            if (full) {
+                bad.append(name).append(' ');
+            }
+        }
+        verdict("no_machine_hides_the_top_face_of_the_block_below_it", bad.length() == 0, bad.length() == 0 ? "none occlude as a full cube" : "full-cube occluders: " + bad);
     }
 
     private static void efficiency(BlockPos p) {

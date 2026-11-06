@@ -8,7 +8,7 @@ Spend: none
 - [x] Layout: shared common/ plus master version-26.2 code synced to 26.1.2 and 26.3, and six loader layers (w:3)
 - [x] Gradle builds compile on Forge and NeoForge for 26.1.2, 26.2 and 26.3 (w:4)
 - [x] 32 unit tests for storage, priority routing, graph, planner (including tag substitutes), scheduler, persistence and power (w:4)
-- [x] Headless server self test, 33 checks, SELFTEST DONE failures=0 on all six layers (w:4)
+- [x] Headless server self test, 34 checks, SELFTEST DONE failures=0 on all six layers (w:4)
 - [x] Combined jar per Minecraft version with a dev-tools-out-of-release check (CI dry run and release built three jars, none with dev files) (w:3)
 - [~] GitHub repository (public repo exists, first commit pushed; later commits local until the PM pushes) (w:1)
 

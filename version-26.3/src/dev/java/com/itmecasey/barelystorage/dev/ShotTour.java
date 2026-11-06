@@ -59,6 +59,7 @@ public final class ShotTour {
     private static final boolean SCALES = "scales".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean JEI = "jei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean REI = "rei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean STACK = "stack".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -226,6 +227,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (STACK) {
+            stackSteps(y);
+            return;
+        }
         if (JEI || REI) {
             jeiSteps(y);
             return;
@@ -333,6 +338,31 @@ public final class ShotTour {
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
         then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    private static void stackSteps(int y) {
+        then(5, () -> {
+            server("setblock 0 " + y + " 8 minecraft:smooth_stone", "setblock 2 " + y + " 8 minecraft:smooth_stone", "setblock 4 " + y + " 8 minecraft:smooth_stone",
+                    "setblock 6 " + y + " 8 minecraft:smooth_stone", "setblock 8 " + y + " 8 minecraft:smooth_stone");
+        });
+        then(5, () -> {
+            put("server_rack", 0, y + 1, 8, "[facing=north]");
+            put("storage_terminal", 2, y + 1, 8, "[facing=north]");
+            put("assembler", 4, y + 1, 8, "");
+            put("rack_bus_cable", 6, y + 1, 8, "");
+            put("interface_node", 8, y + 1, 8, "[facing=down]");
+        });
+        then(30, () -> moveTo(new Vec3(4.5, y + 2.6, 4.6), new Vec3(4.5, y + 1.0, 8.5)));
+        shoot("stack_front_high", 40);
+        then(2, () -> moveTo(new Vec3(4.5, y + 1.55, 5.0), new Vec3(4.5, y + 1.0, 8.5)));
+        shoot("stack_front_low", 40);
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.options.pauseOnLostFocus = pauseOnLostFocus;

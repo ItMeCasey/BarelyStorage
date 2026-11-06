@@ -1,0 +1,13 @@
+# Changelog
+
+## 2026.11.2
+
+- Fixed: the top face of the block under a Server Rack, a terminal or an Assembler was invisible (see-through). These blocks now use no full-cube occlusion, like the cable and the nodes.
+- The Efficiency upgrade card now lowers rack upkeep (10 percent per card in the network, up to 50 percent).
+- JEI plus button fixed for the Crafting and Pattern Terminals; REI and BEI plus buttons and search sync added.
+- Smaller icons and buttons, Silkscreen font for titles and labels, per-GUI-scale crisp icon sprites.
+- Jade plugin for the rack and nodes (NeoForge).
+
+## 2026.11.1
+
+- First build: Server Rack, drives, bus cable, nodes, terminals, Assembler, upgrades, CPU and RAM blades.

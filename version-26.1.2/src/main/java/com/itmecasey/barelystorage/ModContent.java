@@ -68,7 +68,7 @@ public final class ModContent {
             }
         }
         RackBlock rack = new RackBlock(props("server_rack").mapColor(MapColor.METAL).strength(4.0F, 8.0F).sound(SoundType.METAL)
-                .requiresCorrectToolForDrops().lightLevel(s -> s.getValue(RackBlock.ONLINE) ? 6 : 0));
+                .requiresCorrectToolForDrops().lightLevel(s -> s.getValue(RackBlock.ONLINE) ? 6 : 0).noOcclusion());
         block("server_rack", rack);
         block("rack_bus_cable", new CableBlock(props("rack_bus_cable").mapColor(MapColor.COLOR_GRAY).strength(1.5F, 4.0F).sound(SoundType.METAL).noOcclusion()));
         NodeBlock bus = new NodeBlock(NodeBlock.Kind.BUS, node("storage_bus"));
@@ -80,14 +80,14 @@ public final class ModContent {
         NodeBlock exp = new NodeBlock(NodeBlock.Kind.EXPORT, node("export_node"));
         block("export_node", exp);
         block("storage_terminal", new TerminalBlock(TerminalBlock.Kind.STORAGE, props("storage_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
-                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
+                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8).noOcclusion()));
         block("crafting_terminal", new TerminalBlock(TerminalBlock.Kind.CRAFTING, props("crafting_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
-                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
+                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8).noOcclusion()));
         block("queue_terminal", new TerminalBlock(TerminalBlock.Kind.QUEUE, props("queue_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
-                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
+                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8).noOcclusion()));
         block("pattern_terminal", new TerminalBlock(TerminalBlock.Kind.PATTERN, props("pattern_terminal").mapColor(MapColor.METAL).strength(3.5F, 6.0F)
-                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8)));
-        block("assembler", new AssemblerBlock(props("assembler").mapColor(MapColor.METAL).strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+                .sound(SoundType.METAL).requiresCorrectToolForDrops().lightLevel(s -> 8).noOcclusion()));
+        block("assembler", new AssemblerBlock(props("assembler").mapColor(MapColor.METAL).strength(4.0F, 8.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
         RACK = new BlockEntityType<>(RackBlockEntity::new, Set.of(rack));
         BUS = new BlockEntityType<>(StorageBusBlockEntity::new, Set.of(bus));
         INTERFACE = new BlockEntityType<>(InterfaceNodeBlockEntity::new, Set.of(iface));
