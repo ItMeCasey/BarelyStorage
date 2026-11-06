@@ -9,6 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 import art  # noqa: E402
+import icons  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 MOD = "barelystorage"
@@ -298,8 +299,10 @@ LANG = {
     "gui.barelystorage.view_both": "Crafting + Available",
     "gui.barelystorage.view_available": "Available only",
     "gui.barelystorage.view_craftable": "Craftable only",
-    "gui.barelystorage.start": "Start",
+    "gui.barelystorage.start": "Start crafting",
     "gui.barelystorage.cancel": "Cancel",
+    "gui.barelystorage.tip_add": "Add %s",
+    "gui.barelystorage.tip_remove": "Remove %s",
     "gui.barelystorage.craft_title": "Craft",
     "gui.barelystorage.craft_amount": "Amount: %s",
     "gui.barelystorage.page": "Page %s / %s",
@@ -308,7 +311,7 @@ LANG = {
     "gui.barelystorage.stored": "Stored: %s",
     "gui.barelystorage.encode": "Encode",
     "gui.barelystorage.tags": "Tags",
-    "gui.barelystorage.tags_tip": "Tags: also accept items that share a tag with each ingredient",
+    "gui.barelystorage.tags_tip": "Tags: also accept items that share a tag with each ingredient (on when lit)",
     "gui.barelystorage.queue_empty": "No crafting jobs",
     "gui.barelystorage.queue_running": "Running",
     "gui.barelystorage.queue_waiting": "Waiting",
@@ -337,6 +340,7 @@ LANG = {
 
 
 def main():
+    icons.write_all(os.path.join(ASSETS, "textures", "gui", "icon"))
     blocks, items = art.write_all(os.path.join(ASSETS, "textures", "block"), os.path.join(ASSETS, "textures", "item"))
     if not KEEP_MODELS:
         models()

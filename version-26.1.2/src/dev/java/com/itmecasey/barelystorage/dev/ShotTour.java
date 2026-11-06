@@ -260,9 +260,9 @@ public final class ShotTour {
         shoot("gui_terminal_craftable_view", 20);
         then(2, () -> clickPanel(8 + 8, 34 + 8));
         shoot("gui_terminal_request", 10);
-        then(2, () -> clickPanel(27 + 4 + 21 * 5 + 10, 52 + 38 + 7));
+        then(2, () -> clickPanel(27 + 8 + 19 * 5 + 8, 52 + 38 + 8));
         shoot("gui_terminal_request_plus_100", 6);
-        then(2, () -> clickPanel(27 + 66 + 30, 52 + 58 + 8));
+        then(2, () -> clickPanel(27 + 82 + 9, 52 + 58 + 9));
         then(2, () -> typeIntoScreen("ingot"));
         shoot("gui_terminal_search", 30);
         then(2, () -> {

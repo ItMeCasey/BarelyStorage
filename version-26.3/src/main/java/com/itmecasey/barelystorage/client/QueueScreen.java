@@ -4,8 +4,6 @@ import com.itmecasey.barelystorage.menu.QueueMenu;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 
 /** The Crafting Queue Terminal: each job with its progress bar, state and a cancel button, and the halt error when the queue is stuck. */
 public class QueueScreen extends AbstractContainerScreen<QueueMenu> {
-    private final List<Button> cancels = new ArrayList<>();
+    private final List<GlyphButton> cancels = new ArrayList<>();
 
     public QueueScreen(QueueMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, menu.playerY() + 82);
@@ -29,11 +27,11 @@ public class QueueScreen extends AbstractContainerScreen<QueueMenu> {
         cancels.clear();
         for (int i = 0; i < QueueMenu.JOBS; i++) {
             final int job = i;
-            Button b = Button.builder(Ui.t("✕"), x -> {
+            GlyphButton b = new GlyphButton(leftPos + 154, topPos + 31 + i * 20, 14, () -> "cancel", () -> {
                 if (minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, job);
                 }
-            }).bounds(leftPos + 154, topPos + 30 + i * 20, 14, 16).tooltip(Tooltip.create(Component.translatable("gui.barelystorage.queue_cancel"))).build();
+            }, () -> Component.translatable("gui.barelystorage.queue_cancel"), () -> false);
             cancels.add(addRenderableWidget(b));
         }
     }
