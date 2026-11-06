@@ -54,6 +54,7 @@ public final class ShotTour {
     private static final boolean ENABLED = System.getenv("BARELYSTORAGE_SHOTS") != null;
     private static final boolean PLAY = "play".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean BEI = "bei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean SEARCH = "search".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -221,6 +222,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (SEARCH) {
+            searchSteps(y);
+            return;
+        }
         if (BEI) {
             beiSteps(y);
             return;
@@ -311,6 +316,63 @@ public final class ShotTour {
         then(2, () -> close());
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
+        then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    private static String beiBox() {
+        try {
+            Class<?> c = Class.forName("com.itmecasey.bei.client.BrowserPanel");
+            var f = c.getDeclaredField("box");
+            f.setAccessible(true);
+            return ((net.minecraft.client.gui.components.EditBox) f.get(null)).getValue();
+        } catch (ReflectiveOperationException e) {
+            return "?" + e;
+        }
+    }
+
+    private static void beiTypeInBox(String text) {
+        try {
+            Class<?> c = Class.forName("com.itmecasey.bei.client.BrowserPanel");
+            var f = c.getDeclaredField("box");
+            f.setAccessible(true);
+            ((net.minecraft.client.gui.components.EditBox) f.get(null)).setValue(text);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("BARELYSTORAGE-SHOTS bei box failed", e);
+        }
+    }
+
+    private static void searchLog(String label) {
+        var screen = Minecraft.getInstance().screen;
+        String terminal = screen instanceof com.itmecasey.barelystorage.client.TerminalScreen t ? t.devSearchText() : "(no terminal)";
+        LOGGER.info("BARELYSTORAGE-SHOTS search {}: terminal='{}' bei='{}'", label, terminal, beiBox());
+    }
+
+    private static void searchSteps(int y) {
+        then(30, () -> moveTo(new Vec3(2.5, y + 1.0, -2.0), new Vec3(2.5, y + 0.5, 0.5)));
+        then(10, () -> open(new BlockPos(2, y, 0)));
+        then(30, () -> {
+            var screen = Minecraft.getInstance().screen;
+            if (screen instanceof com.itmecasey.barelystorage.client.TerminalScreen t) {
+                LOGGER.info("BARELYSTORAGE-SHOTS search sync on={}", t.devToggleSync());
+            }
+        });
+        then(10, () -> {
+            if (Minecraft.getInstance().screen instanceof com.itmecasey.barelystorage.client.TerminalScreen t) {
+                t.devSetSearch("iron");
+            }
+        });
+        then(20, () -> searchLog("after typing in the terminal"));
+        shoot("search_typed_in_terminal", 5);
+        then(2, () -> beiTypeInBox("gold"));
+        then(20, () -> searchLog("after typing in BEI"));
+        shoot("search_typed_in_bei", 5);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();

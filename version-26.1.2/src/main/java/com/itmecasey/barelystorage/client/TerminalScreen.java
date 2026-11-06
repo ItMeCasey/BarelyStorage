@@ -224,6 +224,27 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         lastTerminal = search.getValue();
     }
 
+    /** Dev tour hook: switches the viewer search sync on and returns whether it is on. */
+    public boolean devToggleSync() {
+        if (SearchSync.available()) {
+            syncSearch = !syncSearch;
+            lastViewer = SearchSync.get();
+            lastTerminal = search.getValue();
+            if (syncSearch) {
+                SearchSync.set(lastTerminal);
+            }
+        }
+        return syncSearch;
+    }
+
+    public void devSetSearch(String text) {
+        search.setValue(text);
+    }
+
+    public String devSearchText() {
+        return search.getValue();
+    }
+
     private void press(int id) {
         if (minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
