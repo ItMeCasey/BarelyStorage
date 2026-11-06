@@ -37,7 +37,6 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         super.extractBackground(g, mouseX, mouseY, a);
         Ui.panel(g, leftPos, topPos, imageWidth, imageHeight);
-        Ui.panel(g, leftPos + menu.upgradeX - 5, topPos + menu.upgradeY - 15, 46, NodeMenu.UPGRADES * 18 + 21);
         int start = menu.areaStart();
         int end = start + 45;
         for (Slot s : menu.slots) {
@@ -65,7 +64,6 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
             case BUS -> "gui.barelystorage.bus_filter";
         };
         Ui.text(g, font, Component.translatable(area), menu.areaX, menu.areaY - 10, Ui.MUTED);
-        Ui.text(g, font, Component.translatable("gui.barelystorage.upgrades"), menu.upgradeX, menu.upgradeY - 10, Ui.MUTED);
         if (tall) {
             Ui.text(g, font, Component.translatable("gui.barelystorage.buffer"), menu.bufferX, menu.bufferY - 10, Ui.MUTED);
         }

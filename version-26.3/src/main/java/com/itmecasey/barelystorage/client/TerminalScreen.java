@@ -85,29 +85,29 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
 
     /** The glyph column: height, theme, sort method, order, view. Each click moves to the next state. */
     private void buildGlyphs() {
-        int x = leftPos - 22;
+        int x = leftPos - 18;
         int y = topPos + 5;
         addRenderableWidget(new GlyphButton(x, y, GlyphButton.HEIGHT, () -> ClientSettings.height, () -> {
             ClientSettings.height = (ClientSettings.height + 1) % 3;
             ClientSettings.save();
             press(TerminalMenu.BTN_HEIGHT + ClientSettings.height);
         }, () -> Component.translatable("gui.barelystorage.tip_height", Component.translatable("gui.barelystorage.size_" + ClientSettings.height))));
-        addRenderableWidget(new GlyphButton(x, y + 20, GlyphButton.THEME, () -> ClientSettings.theme, () -> {
+        addRenderableWidget(new GlyphButton(x, y + 16, GlyphButton.THEME, () -> ClientSettings.theme, () -> {
             ClientSettings.theme = 1 - ClientSettings.theme;
             ClientSettings.save();
             Ui.theme(ClientSettings.theme == 1);
         }, () -> Component.translatable("gui.barelystorage.tip_theme", Component.translatable(ClientSettings.theme == 0 ? "gui.barelystorage.theme_dark" : "gui.barelystorage.theme_light"))));
-        addRenderableWidget(new GlyphButton(x, y + 40, GlyphButton.SORT, () -> ClientSettings.sort, () -> {
+        addRenderableWidget(new GlyphButton(x, y + 32, GlyphButton.SORT, () -> ClientSettings.sort, () -> {
             ClientSettings.sort = (ClientSettings.sort + 1) % 3;
             ClientSettings.save();
             press(TerminalMenu.BTN_SORT + ClientSettings.sort);
         }, () -> Component.translatable("gui.barelystorage.tip_sort", Component.translatable("gui.barelystorage.sort_full_" + ClientSettings.sort))));
-        addRenderableWidget(new GlyphButton(x, y + 60, GlyphButton.ORDER, () -> ClientSettings.order, () -> {
+        addRenderableWidget(new GlyphButton(x, y + 48, GlyphButton.ORDER, () -> ClientSettings.order, () -> {
             ClientSettings.order = 1 - ClientSettings.order;
             ClientSettings.save();
             press(TerminalMenu.BTN_ORDER + ClientSettings.order);
         }, () -> Component.translatable("gui.barelystorage.tip_order", Component.translatable(ClientSettings.order == 0 ? "gui.barelystorage.order_asc" : "gui.barelystorage.order_desc"))));
-        addRenderableWidget(new GlyphButton(x, y + 80, GlyphButton.VIEW, () -> ClientSettings.view, () -> {
+        addRenderableWidget(new GlyphButton(x, y + 64, GlyphButton.VIEW, () -> ClientSettings.view, () -> {
             ClientSettings.view = (ClientSettings.view + 1) % 3;
             ClientSettings.save();
             press(TerminalMenu.BTN_VIEW + ClientSettings.view);
@@ -121,7 +121,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         if (menu.kind() == TerminalMenu.Kind.CRAFTING) {
             button(Component.translatable("gui.barelystorage.clear"), leftPos + 148, y + 40, 30, 14, b -> press(TerminalMenu.BTN_GRID_CLEAR));
         } else if (menu.kind() == TerminalMenu.Kind.PATTERN) {
-            int row = y + 60;
+            int row = y + 62;
             modeButton = button(Component.empty(), leftPos + 8, row, 56, 14, b -> press(TerminalMenu.BTN_MODE));
             tagsButton = addRenderableWidget(Button.builder(Ui.t(Component.translatable("gui.barelystorage.tags")), b -> press(TerminalMenu.BTN_TAGS))
                     .bounds(leftPos + 66, row, 38, 14).tooltip(Tooltip.create(Component.translatable("gui.barelystorage.tags_tip"))).build());
@@ -153,8 +153,8 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
             Ui.text(g, font, "\u2192", leftPos + 90, y + 4, GOLD);
             modeButton.setMessage(Ui.t(Component.translatable(processing ? "gui.barelystorage.mode_processing" : "gui.barelystorage.mode_crafting")));
             tagsButton.setMessage(menu.tags() ? Ui.t(Component.translatable("gui.barelystorage.tags"), GOLD) : Ui.t(Component.translatable("gui.barelystorage.tags")));
-            Ui.text(g, font, Component.translatable("gui.barelystorage.blank"), leftPos + 126, y + 4, Ui.MUTED);
-            Ui.text(g, font, Component.translatable("gui.barelystorage.encoded"), leftPos + 126, y + 40, Ui.MUTED);
+            Ui.text(g, font, Component.translatable("gui.barelystorage.blank"), leftPos + 142, y + 18, Ui.MUTED);
+            Ui.text(g, font, Component.translatable("gui.barelystorage.encoded"), leftPos + 142, y + 54, Ui.MUTED);
             if (processing) {
                 g.fill(leftPos + 103, y + 17, leftPos + 121, y + 35, 0xAA0B0A14);
             } else {
@@ -304,8 +304,6 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         super.extractBackground(g, mouseX, mouseY, a);
-        // The glyph column sits on its own small plate beside the main panel.
-        Ui.panel(g, leftPos - 26, topPos + 1, 26, 5 * 20 + 9);
         Ui.panel(g, leftPos, topPos, imageWidth, imageHeight);
         Ui.slots(g, menu.slots, leftPos, topPos);
         boolean online = menu.online();

@@ -40,7 +40,7 @@ final class GlyphButton extends AbstractWidget {
     private Component lastTip;
 
     GlyphButton(int x, int y, String[][] glyph, IntSupplier state, Runnable action, java.util.function.Supplier<Component> tip) {
-        super(x, y, 18, 18, Component.empty());
+        super(x, y, 14, 14, Component.empty());
         this.glyph = glyph;
         this.state = state;
         this.action = action;
@@ -57,17 +57,17 @@ final class GlyphButton extends AbstractWidget {
         int x = getX();
         int y = getY();
         boolean hover = isHovered();
-        g.fill(x, y, x + 18, y + 18, hover ? Ui.GOLD : Ui.EDGE);
-        g.fill(x + 1, y + 1, x + 17, y + 17, hover ? Ui.PANEL : Ui.SLOT);
+        g.fill(x, y, x + 14, y + 14, hover ? Ui.GOLD : Ui.EDGE);
+        g.fill(x + 1, y + 1, x + 13, y + 13, hover ? Ui.PANEL : Ui.SLOT);
         String[] rows = glyph[Math.max(0, Math.min(glyph.length - 1, state.getAsInt()))];
         int color = hover ? Ui.GOLD : Ui.title();
         for (int r = 0; r < 9; r++) {
             for (int c = 0; c < 9; c++) {
                 char ch = rows[r].charAt(c);
                 if (ch == '#') {
-                    g.fill(x + 4 + c, y + 4 + r, x + 5 + c, y + 5 + r, color);
+                    g.fill(x + 2 + c, y + 2 + r, x + 3 + c, y + 3 + r, color);
                 } else if (ch == '+') {
-                    g.fill(x + 4 + c, y + 4 + r, x + 5 + c, y + 5 + r, (color & 0xFFFFFF) | 0x66000000);
+                    g.fill(x + 2 + c, y + 2 + r, x + 3 + c, y + 3 + r, (color & 0xFFFFFF) | 0x66000000);
                 }
             }
         }

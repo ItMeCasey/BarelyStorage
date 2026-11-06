@@ -255,8 +255,8 @@ public final class ShotTour {
         then(10, () -> open(new BlockPos(2, y, 0)));
         shoot("gui_terminal", 40);
         shoot("gui_terminal_glyphs", 6);
-        then(2, () -> clickPanel(-13, 5 + 80 + 9));
-        then(2, () -> clickPanel(-13, 5 + 80 + 9));
+        then(2, () -> clickPanel(-11, 5 + 64 + 7));
+        then(2, () -> clickPanel(-11, 5 + 64 + 7));
         shoot("gui_terminal_craftable_view", 20);
         then(2, () -> clickPanel(8 + 8, 34 + 8));
         shoot("gui_terminal_request", 10);

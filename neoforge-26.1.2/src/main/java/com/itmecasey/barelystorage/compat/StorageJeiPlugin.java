@@ -1,0 +1,87 @@
+package com.itmecasey.barelystorage.compat;
+
+import com.itmecasey.barelystorage.ModContent;
+import com.itmecasey.barelystorage.client.ViewerFill;
+import com.itmecasey.barelystorage.menu.TerminalMenu;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.gui.ingredient.IRecipeSlotView;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.transfer.IRecipeTransferError;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
+import mezz.jei.api.recipe.types.IRecipeType;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import org.jetbrains.annotations.Nullable;
+
+/** JEI: the plus button of a crafting recipe fills the grid of a Crafting or Pattern Terminal. Loaded only when JEI is installed. */
+@JeiPlugin
+public class StorageJeiPlugin implements IModPlugin {
+    @Override
+    public Identifier getPluginUid() {
+        return ModContent.id("jei");
+    }
+
+    @Override
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+        for (TerminalMenu.Kind kind : new TerminalMenu.Kind[] {TerminalMenu.Kind.CRAFTING, TerminalMenu.Kind.PATTERN}) {
+            for (int rows : TerminalMenu.ROWS) {
+                registration.addRecipeTransferHandler(new Handler(registration.getTransferHelper(), ModContent.terminalMenu(kind, rows)), RecipeTypes.CRAFTING);
+            }
+        }
+    }
+
+    private record Handler(IRecipeTransferHandlerHelper helper, MenuType<TerminalMenu> type) implements IRecipeTransferHandler<TerminalMenu, RecipeHolder<CraftingRecipe>> {
+        @Override
+        public Class<? extends TerminalMenu> getContainerClass() {
+            return TerminalMenu.class;
+        }
+
+        @Override
+        public Optional<MenuType<TerminalMenu>> getMenuType() {
+            return Optional.of(type);
+        }
+
+        @Override
+        public IRecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
+            return RecipeTypes.CRAFTING;
+        }
+
+        @Nullable
+        @Override
+        public IRecipeTransferError transferRecipe(TerminalMenu menu, RecipeHolder<CraftingRecipe> recipe, IRecipeSlotsView slots, Player player, boolean maxTransfer, boolean doTransfer) {
+            if (!ViewerFill.accepts(menu)) {
+                return helper.createInternalError();
+            }
+            if (!doTransfer) {
+                return null;
+            }
+            List<IRecipeSlotView> inputs = slots.getSlotViews(RecipeIngredientRole.INPUT);
+            Map<Integer, ?> positions = helper.getGuiSlotIndexToIngredientMap(recipe);
+            List<Integer> keys = new ArrayList<>(positions.keySet());
+            java.util.Collections.sort(keys);
+            ItemStack[] grid = new ItemStack[TerminalMenu.GRID];
+            for (int i = 0; i < inputs.size(); i++) {
+                // Crafting grid slots in a vanilla crafting menu are numbered from 1; slot 0 is the result.
+                int cell = i < keys.size() ? keys.get(i) - 1 : i;
+                if (cell >= 0 && cell < TerminalMenu.GRID) {
+                    grid[cell] = ViewerFill.pick(inputs.get(i).getItemStacks().toList(), menu, player);
+                }
+            }
+            ViewerFill.send(menu, grid);
+            return null;
+        }
+    }
+}

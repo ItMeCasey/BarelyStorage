@@ -17,6 +17,7 @@ MASTER = "26.2"
 
 
 def copy_tree(src, dst, transform=None):
+    written = set()
     for base, _, files in os.walk(src):
         for name in files:
             if not name.endswith(".java"):
@@ -24,6 +25,7 @@ def copy_tree(src, dst, transform=None):
             path = os.path.join(base, name)
             rel = os.path.relpath(path, src)
             out = os.path.join(dst, rel)
+            written.add(os.path.abspath(out))
             os.makedirs(os.path.dirname(out), exist_ok=True)
             text = open(path, encoding="utf-8").read()
             if transform:
@@ -59,7 +61,6 @@ def main():
             dst = os.path.join(ROOT, f"version-{v}", "src", kind, "java")
             if not os.path.isdir(src):
                 continue
-            shutil.rmtree(dst, ignore_errors=True)
             if v == "26.1.2":
                 copy_tree(src, dst, transform if kind == "dev" else None)
             else:
@@ -71,7 +72,6 @@ def main():
                 s = os.path.join(src, kind, "java")
                 if os.path.isdir(s):
                     d = os.path.join(ROOT, f"{loader}-{v}", "src", kind, "java")
-                    shutil.rmtree(d, ignore_errors=True)
                     copy_tree(s, d)
     print("synced")
 

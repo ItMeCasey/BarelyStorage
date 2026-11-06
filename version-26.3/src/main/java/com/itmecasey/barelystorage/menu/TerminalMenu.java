@@ -208,7 +208,7 @@ public class TerminalMenu extends StorageMenu {
             });
         }
         this.resultSlot = resultIndex;
-        int extraHeight = kind == Kind.STORAGE ? 0 : kind == Kind.CRAFTING ? 58 : 76;
+        int extraHeight = kind == Kind.STORAGE ? 0 : kind == Kind.CRAFTING ? 58 : 86;
         this.playerY = LIST_Y + rows * 18 + 16 + extraHeight;
         this.firstPlayerSlot = slots.size();
         this.owner = inventory.player;

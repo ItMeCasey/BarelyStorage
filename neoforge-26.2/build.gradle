@@ -131,6 +131,10 @@ if (project.hasProperty('windowSize')) {
 
 def viewerFiles = [smwti: 'smwti-1781438:9450813', jade: 'jade-324717:8755115', jei: 'jei-238222:9352384', rei: 'roughly-enough-items-310111:8271756', bei: 'bei-1783910:9451209', architectury: 'architectury-api-419699:9111233', cloth: 'cloth-config-348521:8269700']
 dependencies {
+    compileOnly "curse.maven:${viewerFiles.jei}"
+    compileOnly "curse.maven:${viewerFiles.rei}"
+    compileOnly "curse.maven:${viewerFiles.architectury}"
+    compileOnly "curse.maven:${viewerFiles.cloth}"
     compileOnly 'curse.maven:jade-324717:8755115'
 }
 if (project.hasProperty('viewers')) {
