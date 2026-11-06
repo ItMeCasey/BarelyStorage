@@ -8,6 +8,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 displayURL="https://itmecasey.com/wiki/barelystorage/"
+logoFile="barelystorage_logo.png"
 description='''${mod_description}'''
 
 [[dependencies.${mod_id}]]
