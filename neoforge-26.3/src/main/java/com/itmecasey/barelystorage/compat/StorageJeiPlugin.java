@@ -31,7 +31,8 @@ import org.jetbrains.annotations.Nullable;
 public class StorageJeiPlugin implements IModPlugin {
     @Override
     public Identifier getPluginUid() {
-        return ModContent.id("jei");
+        // JEI asks for this while mods are still loading; touching ModContent here would build the blocks too early.
+        return Identifier.fromNamespaceAndPath("barelystorage", "jei");
     }
 
     @Override
