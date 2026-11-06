@@ -5,6 +5,7 @@ import com.itmecasey.barelystorage.menu.TerminalMenu;
 import com.itmecasey.bei.api.BeiPlugin;
 import com.itmecasey.bei.api.IBeiPlugin;
 import com.itmecasey.bei.api.IRecipeTransferHandler;
+import com.itmecasey.bei.api.ISearchAccess;
 import com.itmecasey.bei.api.ITransferRegistration;
 import com.itmecasey.bei.api.TransferContext;
 import com.itmecasey.bei.api.TransferState;
@@ -14,6 +15,11 @@ import net.minecraft.world.item.ItemStack;
 /** BEI: the plus button of a crafting recipe fills the grid of a Crafting or Pattern Terminal. Loaded only when BEI is installed. */
 @BeiPlugin
 public class StorageBeiPlugin implements IBeiPlugin {
+    @Override
+    public void registerSearch(ISearchAccess search) {
+        com.itmecasey.barelystorage.client.SearchSync.register(search::getText, search::setText);
+    }
+
     @Override
     public void registerTransfers(ITransferRegistration registration) {
         registration.register(new IRecipeTransferHandler<TerminalMenu>() {
