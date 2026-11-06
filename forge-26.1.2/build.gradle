@@ -79,7 +79,7 @@ tasks.withType(Test).configureEach {
 // SMWTI (Show Me What This Is) is an optional look-at overlay of ours. Only its API is compiled against, from the jar in
 // ../libs (the com.itmecasey.smwti.api classes of SMWTI's own jar); the plugin class is never loaded unless SMWTI is installed.
 dependencies {
-    compileOnly files('libs/bei-forge-26.1.2-2026.11.6-api.jar')
+    compileOnly files('libs/bei-forge-26.1.2-2026.11.7-api.jar')
     compileOnly 'curse.maven:smwti-1781438:9450262'
 }
 

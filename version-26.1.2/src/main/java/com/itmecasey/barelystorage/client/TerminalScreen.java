@@ -25,6 +25,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     private static final int GOLD = 0xFFF2B33D;
     private static final int TRACK_W = 6;
 
+    private static TerminalScreen open;
     private EditBox search;
     private boolean syncSearch;
     private String lastViewer = "";
@@ -48,6 +49,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     @Override
     protected void init() {
         super.init();
+        open = this;
         ClientSettings.load();
         requestButtons.clear();
         search = new EditBox(font, leftPos + 9, topPos + 17, 166, 12, Component.translatable("gui.barelystorage.search"));
@@ -222,6 +224,29 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         }
         lastViewer = SearchSync.get();
         lastTerminal = search.getValue();
+    }
+
+    @Override
+    public void removed() {
+        super.removed();
+        if (open == this) {
+            open = null;
+        }
+    }
+
+    /** The Storage-type terminal screen that is open, or null. */
+    public static TerminalScreen current() {
+        return open;
+    }
+
+    /** Adds what the open list shows (the real stored amounts of the items on screen) to a counter; craftable-only entries count zero. */
+    public void countVisible(java.util.function.BiConsumer<net.minecraft.world.item.Item, Long> out) {
+        for (int i = 0; i < menu.viewSlots(); i++) {
+            Slot s = menu.slots.get(i);
+            if (s.hasItem() && !menu.craftableAt(i)) {
+                out.accept(s.getItem().getItem(), menu.countAt(i));
+            }
+        }
     }
 
     /** Dev tour hook: switches the viewer search sync on and returns whether it is on. */

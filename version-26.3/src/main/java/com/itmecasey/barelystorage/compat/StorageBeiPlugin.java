@@ -6,6 +6,7 @@ import com.itmecasey.bei.api.BeiPlugin;
 import com.itmecasey.bei.api.IBeiPlugin;
 import com.itmecasey.bei.api.IRecipeTransferHandler;
 import com.itmecasey.bei.api.ISearchAccess;
+import com.itmecasey.bei.api.IStorageRegistration;
 import com.itmecasey.bei.api.ITransferRegistration;
 import com.itmecasey.bei.api.TransferContext;
 import com.itmecasey.bei.api.TransferState;
@@ -15,6 +16,20 @@ import net.minecraft.world.item.ItemStack;
 /** BEI: the plus button of a crafting recipe fills the grid of a Crafting or Pattern Terminal. Loaded only when BEI is installed. */
 @BeiPlugin
 public class StorageBeiPlugin implements IBeiPlugin {
+    /**
+     * The Master Blueprint counts what the open terminal's list shows: the client only has the rows on screen (the scrolled
+     * window of the list), so with no terminal open, or for items scrolled out of view, nothing is reported.
+     */
+    @Override
+    public void registerStorageSources(IStorageRegistration registration) {
+        registration.register("barelystorage:network", (player, counter) -> {
+            var screen = com.itmecasey.barelystorage.client.TerminalScreen.current();
+            if (screen != null) {
+                screen.countVisible(counter::add);
+            }
+        });
+    }
+
     @Override
     public void registerSearch(ISearchAccess search) {
         com.itmecasey.barelystorage.client.SearchSync.register(search::getText, search::setText);
