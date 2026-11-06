@@ -83,7 +83,7 @@ tasks.withType(Test).configureEach {
 // SMWTI (Show Me What This Is) is an optional look-at overlay of ours. Only its API is compiled against, from the jar in
 // ../libs (the com.itmecasey.smwti.api classes of SMWTI's own jar); the plugin class is never loaded unless SMWTI is installed.
 dependencies {
-    compileOnly files('../libs/smwti-api-26.1.2.jar')
+    compileOnly 'curse.maven:smwti-1781438:9450243'
 }
 
 // Development tools (generator self test, test energy sink, screenshot tour) live in src/dev folders and only build with
@@ -129,7 +129,7 @@ if (project.hasProperty('windowSize')) {
     }
 }
 
-def viewerFiles = [jade: 'jade-324717:9156414', jei: 'jei-238222:9384706', rei: 'roughly-enough-items-310111:8271478', bei: 'bei-1783910:9438907', architectury: 'architectury-api-419699:9111154', cloth: 'cloth-config-348521:7817583']
+def viewerFiles = [smwti: 'smwti-1781438:9450243', jade: 'jade-324717:9156414', jei: 'jei-238222:9384706', rei: 'roughly-enough-items-310111:8271478', bei: 'bei-1783910:9438907', architectury: 'architectury-api-419699:9111154', cloth: 'cloth-config-348521:7817583']
 dependencies {
     compileOnly 'curse.maven:jade-324717:9156414'
 }

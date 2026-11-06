@@ -52,7 +52,9 @@ import org.slf4j.LoggerFactory;
 public final class ShotTour {
     private static final Logger LOGGER = LoggerFactory.getLogger("BarelyStorage");
     private static final boolean ENABLED = System.getenv("BARELYSTORAGE_SHOTS") != null;
+    private static final boolean PLAY = "play".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
+    private static int refillTimer;
 
     private enum Stage { WAITING_FOR_MENU, LOADING_WORLD, TOURING, DONE }
 
@@ -74,13 +76,18 @@ public final class ShotTour {
             return;
         }
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.mouseHandler.isMouseGrabbed()) {
+        if (!PLAY && minecraft.mouseHandler.isMouseGrabbed()) {
             minecraft.mouseHandler.releaseMouse();
         }
         switch (stage) {
             case WAITING_FOR_MENU -> waitForMenu(minecraft);
             case LOADING_WORLD -> waitForWorld(minecraft);
-            case TOURING -> runSteps();
+            case TOURING -> {
+                runSteps();
+                if (PLAY) {
+                    refill();
+                }
+            }
             default -> {
             }
         }
@@ -101,7 +108,7 @@ public final class ShotTour {
             }
         }
         LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE,
-                new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
+                new LevelSettings.DifficultySettings(PLAY ? Difficulty.PEACEFUL : Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
         stage = Stage.LOADING_WORLD;
         idle = 0;
         LOGGER.info("BARELYSTORAGE-SHOTS creating world");
@@ -143,8 +150,8 @@ public final class ShotTour {
     private static void plan() {
         int y = ground;
         then(0, () -> {
-            server("gamerule doDaylightCycle false", "gamerule doWeatherCycle false", "gamerule doMobSpawning false",
-                    "time set noon", "weather clear", "kill @e[type=!player]", "clear @p");
+            server("gamerule advance_time false", "gamerule advance_weather false", "gamerule spawn_mobs false", "gamerule spawn_monsters false",
+                    "difficulty peaceful", "time set noon", "weather clear", "kill @e[type=!player,type=!item]", "clear @p");
             player().getAbilities().flying = false;
             Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
         });
@@ -209,6 +216,20 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (PLAY) {
+            then(10, () -> {
+                StringBuilder sb = new StringBuilder();
+                for (String name : ModContent.items().keySet()) {
+                    server("give @p barelystorage:" + name + (name.contains("pattern") ? " 16" : name.equals("rack_bus_cable") ? " 64" : ""));
+                }
+                server("give @p minecraft:iron_ingot 64", "give @p minecraft:redstone 64", "give @p minecraft:raw_iron 64", "give @p minecraft:coal 64",
+                        "give @p minecraft:oak_log 64", "give @p minecraft:oak_planks 64", "give @p minecraft:cobblestone 64", "give @p minecraft:furnace 4",
+                        "give @p minecraft:chest 4", "give @p minecraft:hopper 4", "give @p minecraft:diamond 32", "give @p minecraft:gold_ingot 64");
+                server("tp @a 4.5 " + y + " -4 0 12", "gamemode creative @a");
+                LOGGER.info("BARELYSTORAGE-SHOTS play mode ready");
+            });
+            return;
+        }
         then(30, () -> moveTo(new Vec3(4.0, y + 2.4, -8.0), new Vec3(4.0, y + 1.2, 0.5)));
         shoot("room_overview", 30);
         then(2, () -> moveTo(new Vec3(0.5, y + 1.6, -3.0), new Vec3(0.5, y + 1.0, 0.5)));
@@ -260,6 +281,22 @@ public final class ShotTour {
             LOGGER.info("BARELYSTORAGE-SHOTS DONE");
             stage = Stage.DONE;
             minecraft.stop();
+        });
+    }
+
+    /** Play mode: keeps the two racks charged so the room keeps working while someone plays. */
+    private static void refill() {
+        if (++refillTimer % 100 != 0) {
+            return;
+        }
+        server("kill @e[type=!player,type=!item]", "time set noon", "weather clear");
+        onServer(server -> {
+            ServerLevel level = server.overworld();
+            for (int dy = 0; dy <= 1; dy++) {
+                if (level.getBlockEntity(new BlockPos(0, ground + dy, 0)) instanceof RackBlockEntity r) {
+                    r.setEnergy(r.maxEnergy());
+                }
+            }
         });
     }
 
