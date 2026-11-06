@@ -252,6 +252,15 @@ public final class ShotTour {
         then(2, () -> close());
         then(10, () -> open(new BlockPos(2, y, 0)));
         shoot("gui_terminal", 40);
+        shoot("gui_terminal_glyphs", 6);
+        then(2, () -> clickPanel(-13, 5 + 80 + 9));
+        then(2, () -> clickPanel(-13, 5 + 80 + 9));
+        shoot("gui_terminal_craftable_view", 20);
+        then(2, () -> clickPanel(8 + 8, 34 + 8));
+        shoot("gui_terminal_request", 10);
+        then(2, () -> clickPanel(27 + 4 + 21 * 5 + 10, 52 + 38 + 7));
+        shoot("gui_terminal_request_plus_100", 6);
+        then(2, () -> clickPanel(27 + 66 + 30, 52 + 58 + 8));
         then(2, () -> typeIntoScreen("ingot"));
         shoot("gui_terminal_search", 30);
         then(2, () -> {
@@ -265,9 +274,18 @@ public final class ShotTour {
         then(10, () -> open(new BlockPos(6, y, 0)));
         shoot("gui_assembler", 30);
         then(2, () -> close());
+        then(2, () -> moveTo(new Vec3(9.3, y + 1.6, -2.5), new Vec3(9.3, y + 1.0, 0.5)));
         then(10, () -> open(new BlockPos(9, y + 2, 0)));
         shoot("gui_interface", 30);
         then(2, () -> close());
+        then(10, () -> open(new BlockPos(9, y, 0)));
+        shoot("gui_import", 30);
+        then(2, () -> close());
+        then(2, () -> moveTo(new Vec3(2.5, y + 1.6, -2.5), new Vec3(2.5, y + 1.0, 0.5)));
+        then(10, () -> open(new BlockPos(2, y + 1, 0)));
+        shoot("gui_bus", 30);
+        then(2, () -> close());
+        then(2, () -> moveTo(new Vec3(0.5, y + 1.0, -2.0), new Vec3(0.5, y + 0.5, 0.5)));
         // A deep job on a basic core: Thread Exhaustion shows on the rack screen.
         then(5, () -> onServer(server -> {
             ServerLevel level = server.overworld();
@@ -333,7 +351,8 @@ public final class ShotTour {
         onServer(server -> {
             ServerPlayer p = server.getPlayerList().getPlayers().get(0);
             ServerLevel level = server.overworld();
-            level.getBlockState(pos).useWithoutItem(level, p, new BlockHitResult(Vec3.atCenterOf(pos), Direction.NORTH, pos, false));
+            var result = level.getBlockState(pos).useWithoutItem(level, p, new BlockHitResult(Vec3.atCenterOf(pos), Direction.NORTH, pos, false));
+            LOGGER.info("BARELYSTORAGE-SHOTS open {} block={} result={} menu={}", pos, level.getBlockState(pos).getBlock().getDescriptionId(), result, p.containerMenu.getClass().getSimpleName());
         });
     }
 
@@ -342,6 +361,20 @@ public final class ShotTour {
         if (minecraft.gui.screen() != null) {
             minecraft.gui.screen().onClose();
         }
+    }
+
+    /** Clicks the open screen at a position relative to the top left of a 184 x 222 panel (a Storage Terminal at its smallest height). */
+    private static void clickPanel(double dx, double dy) {
+        Minecraft minecraft = Minecraft.getInstance();
+        net.minecraft.client.gui.screens.Screen screen = minecraft.gui.screen();
+        if (screen == null) {
+            return;
+        }
+        double x = (screen.width - 184) / 2.0 + dx;
+        double y = (screen.height - 222) / 2.0 + dy;
+        net.minecraft.client.input.MouseButtonEvent event = new net.minecraft.client.input.MouseButtonEvent(x, y, new net.minecraft.client.input.MouseButtonInfo(0, 0));
+        screen.mouseClicked(event, false);
+        screen.mouseReleased(event);
     }
 
     private static void typeIntoScreen(String text) {

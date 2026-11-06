@@ -17,28 +17,16 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The Storage Terminal: a scrollable, searchable, sortable list of everything in the network. A hamburger button on the left opens
- * a settings window (height, theme, sort, view). Items you can craft but have none of show an outline and a "C"; clicking one opens
+ * The Storage Terminal: a scrollable, searchable, sortable list of everything in the network. A column of glyph buttons on its left
+ * switches height, theme, sort, order and view. Items you can craft but have none of show an outline and a "C"; clicking one opens
  * the craft request window.
  */
 public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     private static final int GOLD = 0xFFF2B33D;
-    private static final int WIN_W = 106;
     private static final int TRACK_W = 6;
 
     private EditBox search;
     private String sent = "";
-    private Button hamburger;
-    private boolean settingsOpen;
-    private int tab;
-    private final List<Button> displayButtons = new ArrayList<>();
-    private final List<Button> viewButtons = new ArrayList<>();
-    private final List<Button> tabButtons = new ArrayList<>();
-    private final Button[] heightButtons = new Button[3];
-    private final Button[] themeButtons = new Button[2];
-    private final Button[] sortButtons = new Button[3];
-    private final Button[] orderButtons = new Button[2];
-    private final Button[] viewModeButtons = new Button[3];
     // Craft request window
     private int requestSlot = -1;
     private int amount = 1;
@@ -58,9 +46,6 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     protected void init() {
         super.init();
         ClientSettings.load();
-        displayButtons.clear();
-        viewButtons.clear();
-        tabButtons.clear();
         requestButtons.clear();
         search = new EditBox(font, leftPos + 9, topPos + 17, 166, 12, Component.translatable("gui.barelystorage.search"));
         search.setMaxLength(40);
@@ -69,11 +54,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         search.setFocused(true);
         addRenderableWidget(search);
         setInitialFocus(search);
-        hamburger = addRenderableWidget(Button.builder(Ui.t("≡"), b -> {
-            settingsOpen = !settingsOpen;
-            updateVisibility();
-        }).bounds(leftPos - 19, topPos + 4, 15, 15).build());
-        buildSettings();
+        buildGlyphs();
         buildRequest();
         updateVisibility();
         // Bring the server in line with the saved choices.
@@ -98,69 +79,40 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         }
     }
 
-    private Button button(Component text, int x, int y, int w, int h, Button.OnPress press) {
-        return addRenderableWidget(Button.builder(Ui.t(text), press).bounds(x, y, w, h).build());
+    /** The glyph column: height, theme, sort method, order, view. Each click moves to the next state. */
+    private void buildGlyphs() {
+        int x = leftPos - 22;
+        int y = topPos + 5;
+        addRenderableWidget(new GlyphButton(x, y, GlyphButton.HEIGHT, () -> ClientSettings.height, () -> {
+            ClientSettings.height = (ClientSettings.height + 1) % 3;
+            ClientSettings.save();
+            press(TerminalMenu.BTN_HEIGHT + ClientSettings.height);
+        }, () -> Component.translatable("gui.barelystorage.tip_height", Component.translatable("gui.barelystorage.size_" + ClientSettings.height))));
+        addRenderableWidget(new GlyphButton(x, y + 20, GlyphButton.THEME, () -> ClientSettings.theme, () -> {
+            ClientSettings.theme = 1 - ClientSettings.theme;
+            ClientSettings.save();
+            Ui.theme(ClientSettings.theme == 1);
+        }, () -> Component.translatable("gui.barelystorage.tip_theme", Component.translatable(ClientSettings.theme == 0 ? "gui.barelystorage.theme_dark" : "gui.barelystorage.theme_light"))));
+        addRenderableWidget(new GlyphButton(x, y + 40, GlyphButton.SORT, () -> ClientSettings.sort, () -> {
+            ClientSettings.sort = (ClientSettings.sort + 1) % 3;
+            ClientSettings.save();
+            press(TerminalMenu.BTN_SORT + ClientSettings.sort);
+        }, () -> Component.translatable("gui.barelystorage.tip_sort", Component.translatable("gui.barelystorage.sort_full_" + ClientSettings.sort))));
+        addRenderableWidget(new GlyphButton(x, y + 60, GlyphButton.ORDER, () -> ClientSettings.order, () -> {
+            ClientSettings.order = 1 - ClientSettings.order;
+            ClientSettings.save();
+            press(TerminalMenu.BTN_ORDER + ClientSettings.order);
+        }, () -> Component.translatable("gui.barelystorage.tip_order", Component.translatable(ClientSettings.order == 0 ? "gui.barelystorage.order_asc" : "gui.barelystorage.order_desc"))));
+        addRenderableWidget(new GlyphButton(x, y + 80, GlyphButton.VIEW, () -> ClientSettings.view, () -> {
+            ClientSettings.view = (ClientSettings.view + 1) % 3;
+            ClientSettings.save();
+            press(TerminalMenu.BTN_VIEW + ClientSettings.view);
+        }, () -> Component.translatable("gui.barelystorage.tip_view", Component.translatable(new String[] {"gui.barelystorage.view_both",
+                "gui.barelystorage.view_available", "gui.barelystorage.view_craftable"}[ClientSettings.view]))));
     }
 
-    private void buildSettings() {
-        int x0 = leftPos - WIN_W - 24;
-        int y0 = topPos + 4;
-        tabButtons.add(button(Component.translatable("gui.barelystorage.tab_display"), x0 + 5, y0 + 5, 46, 14, b -> {
-            tab = 0;
-            updateVisibility();
-        }));
-        tabButtons.add(button(Component.translatable("gui.barelystorage.tab_view"), x0 + 55, y0 + 5, 46, 14, b -> {
-            tab = 1;
-            updateVisibility();
-        }));
-        String[] heights = {"S", "M", "L"};
-        for (int i = 0; i < 3; i++) {
-            final int v = i;
-            heightButtons[i] = button(Component.literal(heights[i]), x0 + 5 + i * 32, y0 + 38, 30, 14, b -> {
-                ClientSettings.height = v;
-                ClientSettings.save();
-                press(TerminalMenu.BTN_HEIGHT + v);
-            });
-            displayButtons.add(heightButtons[i]);
-        }
-        for (int i = 0; i < 2; i++) {
-            final int v = i;
-            themeButtons[i] = button(Component.translatable(i == 0 ? "gui.barelystorage.theme_dark" : "gui.barelystorage.theme_light"), x0 + 5 + i * 48, y0 + 68, 46, 14, b -> {
-                ClientSettings.theme = v;
-                ClientSettings.save();
-                Ui.theme(v == 1);
-            });
-            displayButtons.add(themeButtons[i]);
-        }
-        String[] sorts = {"gui.barelystorage.sort_quantity", "gui.barelystorage.sort_mod", "gui.barelystorage.sort_name"};
-        for (int i = 0; i < 3; i++) {
-            final int v = i;
-            sortButtons[i] = button(Component.translatable(sorts[i]), x0 + 5 + i * 32, y0 + 98, 30, 14, b -> {
-                ClientSettings.sort = v;
-                ClientSettings.save();
-                press(TerminalMenu.BTN_SORT + v);
-            });
-            displayButtons.add(sortButtons[i]);
-        }
-        for (int i = 0; i < 2; i++) {
-            final int v = i;
-            orderButtons[i] = button(Component.translatable(i == 0 ? "gui.barelystorage.order_asc" : "gui.barelystorage.order_desc"), x0 + 5 + i * 48, y0 + 128, 46, 14, b -> {
-                ClientSettings.order = v;
-                ClientSettings.save();
-                press(TerminalMenu.BTN_ORDER + v);
-            });
-            displayButtons.add(orderButtons[i]);
-        }
-        String[] views = {"gui.barelystorage.view_both", "gui.barelystorage.view_available", "gui.barelystorage.view_craftable"};
-        for (int i = 0; i < 3; i++) {
-            final int v = i;
-            viewModeButtons[i] = button(Component.translatable(views[i]), x0 + 5, y0 + 28 + i * 20, 96, 16, b -> {
-                ClientSettings.view = v;
-                ClientSettings.save();
-                press(TerminalMenu.BTN_VIEW + v);
-            });
-            viewButtons.add(viewModeButtons[i]);
-        }
+    private Button button(Component text, int x, int y, int w, int h, Button.OnPress press) {
+        return addRenderableWidget(Button.builder(Ui.t(text), press).bounds(x, y, w, h).build());
     }
 
     private void buildRequest() {
@@ -186,18 +138,6 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     }
 
     private void updateVisibility() {
-        for (Button b : tabButtons) {
-            b.visible = settingsOpen;
-            b.active = settingsOpen;
-        }
-        for (Button b : displayButtons) {
-            b.visible = settingsOpen && tab == 0;
-            b.active = b.visible;
-        }
-        for (Button b : viewButtons) {
-            b.visible = settingsOpen && tab == 1;
-            b.active = b.visible;
-        }
         for (Button b : requestButtons) {
             b.visible = requestSlot >= 0;
             b.active = b.visible;
@@ -309,18 +249,15 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
 
     // ---- Drawing ----
 
-    private Component pick(Component text, boolean selected) {
-        return selected ? Ui.t(text, GOLD) : Ui.t(text);
-    }
-
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         super.extractBackground(g, mouseX, mouseY, a);
+        // The glyph column sits on its own small plate beside the main panel.
+        Ui.panel(g, leftPos - 26, topPos + 1, 26, 5 * 20 + 9);
         Ui.panel(g, leftPos, topPos, imageWidth, imageHeight);
         Ui.slots(g, menu.slots, leftPos, topPos);
         boolean online = menu.online();
         g.fill(leftPos + 166, topPos + 5, leftPos + 176, topPos + 9, online ? Ui.GREEN : Ui.RED);
-        // Scrollbar
         g.fill(trackX(), trackY(), trackX() + TRACK_W, trackY() + trackH(), Ui.SLOT);
         if (menu.maxScroll() > 0) {
             int total = menu.rows() + menu.maxScroll();
@@ -332,32 +269,6 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         if (!online) {
             Component off = Ui.t(Component.translatable("gui.barelystorage.offline"));
             g.text(font, off, leftPos + 92 - font.width(off) / 2, topPos + 80, Ui.RED, false);
-        }
-        if (settingsOpen) {
-            drawSettings(g);
-        }
-        for (int i = 0; i < 3; i++) {
-            heightButtons[i].setMessage(pick(Component.literal(new String[] {"S", "M", "L"}[i]), ClientSettings.height == i));
-            sortButtons[i].setMessage(pick(Component.translatable(new String[] {"gui.barelystorage.sort_quantity", "gui.barelystorage.sort_mod", "gui.barelystorage.sort_name"}[i]), ClientSettings.sort == i));
-            viewModeButtons[i].setMessage(pick(Component.translatable(new String[] {"gui.barelystorage.view_both", "gui.barelystorage.view_available", "gui.barelystorage.view_craftable"}[i]), ClientSettings.view == i));
-        }
-        for (int i = 0; i < 2; i++) {
-            themeButtons[i].setMessage(pick(Component.translatable(i == 0 ? "gui.barelystorage.theme_dark" : "gui.barelystorage.theme_light"), ClientSettings.theme == i));
-            orderButtons[i].setMessage(pick(Component.translatable(i == 0 ? "gui.barelystorage.order_asc" : "gui.barelystorage.order_desc"), ClientSettings.order == i));
-        }
-        tabButtons.get(0).setMessage(pick(Component.translatable("gui.barelystorage.tab_display"), tab == 0));
-        tabButtons.get(1).setMessage(pick(Component.translatable("gui.barelystorage.tab_view"), tab == 1));
-    }
-
-    private void drawSettings(GuiGraphicsExtractor g) {
-        int x0 = leftPos - WIN_W - 24;
-        int y0 = topPos + 4;
-        Ui.panel(g, x0, y0, WIN_W, tab == 0 ? 148 : 92);
-        if (tab == 0) {
-            Ui.text(g, font, Component.translatable("gui.barelystorage.height"), x0 + 6, y0 + 27, Ui.MUTED);
-            Ui.text(g, font, Component.translatable("gui.barelystorage.theme"), x0 + 6, y0 + 57, Ui.MUTED);
-            Ui.text(g, font, Component.translatable("gui.barelystorage.sort_by"), x0 + 6, y0 + 87, Ui.MUTED);
-            Ui.text(g, font, Component.translatable("gui.barelystorage.order"), x0 + 6, y0 + 117, Ui.MUTED);
         }
     }
 
@@ -398,11 +309,11 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         super.extractRenderState(g, mouseX, mouseY, a);
         if (requestSlot >= 0) {
-            drawRequest(g);
+            drawRequest(g, mouseX, mouseY, a);
         }
     }
 
-    private void drawRequest(GuiGraphicsExtractor g) {
+    private void drawRequest(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         g.nextStratum();
         int x = leftPos + 27;
         int y = topPos + 52;
@@ -414,6 +325,9 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         g.text(font, name, x + 28, y + 17, Ui.TEXT, false);
         Component count = Ui.t(Component.translatable("gui.barelystorage.craft_amount", amount));
         g.text(font, count, x + 65 - font.width(count) / 2, y + 28, GOLD, false);
+        for (Button b : requestButtons) {
+            b.extractRenderState(g, mouseX, mouseY, a);
+        }
     }
 
     @Override
