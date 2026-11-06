@@ -135,7 +135,7 @@ public class TerminalMenu extends StorageMenu {
         this.level = level;
         this.pos = pos;
         this.list = new SimpleContainer(view);
-        this.data = new SimpleContainerData(view + 24);
+        this.data = new SimpleContainerData(view * 3 + 24);
         this.slotKeys = new ItemKey[view];
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < COLS; col++) {
@@ -225,6 +225,12 @@ public class TerminalMenu extends StorageMenu {
 
     public int viewSlots() {
         return view;
+    }
+
+    /** The real stored amount of a list slot, sent as two 16-bit halves because the item stack in a container is capped at 64. */
+    public long countAt(int slot) {
+        int base = view + 24 + slot * 2;
+        return (data.get(base) & 0xFFFFL) | ((long) (data.get(base + 1) & 0xFFFF) << 16);
     }
 
     public int dScroll() {
@@ -342,12 +348,17 @@ public class TerminalMenu extends StorageMenu {
             if (at < entries.size()) {
                 Entry e = entries.get(at);
                 slotKeys[i] = e.key();
-                list.setItem(i, Keys.stack(e.key(), (int) Math.max(1, Math.min(Integer.MAX_VALUE, e.count())), net.registries()));
+                list.setItem(i, Keys.stack(e.key(), 1, net.registries()));
                 data.set(i, e.craftable() ? 1 : 0);
+                long shown = Math.max(0, Math.min(Integer.MAX_VALUE, e.count()));
+                data.set(view + 24 + i * 2, (int) (shown & 0xFFFF));
+                data.set(view + 25 + i * 2, (int) ((shown >>> 16) & 0xFFFF));
             } else {
                 slotKeys[i] = null;
                 list.setItem(i, ItemStack.EMPTY);
                 data.set(i, 0);
+                data.set(view + 24 + i * 2, 0);
+                data.set(view + 25 + i * 2, 0);
             }
         }
         data.set(dScroll(), scroll);

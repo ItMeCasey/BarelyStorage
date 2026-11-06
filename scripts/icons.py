@@ -113,6 +113,15 @@ def arrow(up):
     return im
 
 
+def sync():
+    im, d = canvas()
+    line(d, [(2.0, 4.2), (9.6, 4.2)], 1.4)
+    poly(d, [(8.2, 1.8), (10.8, 4.2), (8.2, 6.6)])
+    line(d, [(10.0, 7.8), (2.4, 7.8)], 1.4)
+    poly(d, [(3.8, 5.4), (1.2, 7.8), (3.8, 10.2)])
+    return im
+
+
 def layers():
     im, d = canvas()
     rrect(d, 1.2, 1.2, 7.4, 7.4, 1.2, fill=None, outline=W, w=1.2)
@@ -224,7 +233,7 @@ def write_all(folder):
         "minus_1": stepper(False, 1), "minus_10": stepper(False, 2), "minus_100": stepper(False, 3),
         "plus_1": stepper(True, 1), "plus_10": stepper(True, 2), "plus_100": stepper(True, 3),
         "start": play(), "cancel": cross(),
-        "priority_0": chevrons(True, 2), "priority_1": equals(), "priority_2": chevrons(False, 2),
+        "sync": sync(), "upgrade_hint": arrow(True), "priority_0": chevrons(True, 2), "priority_1": equals(), "priority_2": chevrons(False, 2),
     }
     for name, im in icons.items():
         save(im, folder, name)

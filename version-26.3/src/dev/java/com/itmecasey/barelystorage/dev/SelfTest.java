@@ -67,6 +67,7 @@ public final class SelfTest {
             furnaceProcessing(new BlockPos(x, y + 6, z));
             craftingAndHalt(new BlockPos(x, y + 6, z + 8));
             filtersAndUpgrades(new BlockPos(x, y + 12, z));
+            terminalClicks(new BlockPos(x, y + 18, z));
         } catch (RuntimeException e) {
             LOGGER.error("SELFTEST error", e);
             verdict("selftest_ran_clean", false, e.toString());
@@ -256,6 +257,55 @@ public final class SelfTest {
                         + " steps=" + (r.scheduler().jobs().isEmpty() ? "-" : r.scheduler().jobs().get(0).steps.get(0).pending + "/" + r.scheduler().jobs().get(0).steps.get(0).active)
                         + " err=" + r.scheduler().lastError());
         clear(p.offset(-1, -2, -1), p.offset(4, 2, 2));
+    }
+
+    /** Clicks the Storage Terminal list the way a player does and checks the network really loses what the player gains. */
+    private static void terminalClicks(BlockPos p) {
+        clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+        RackBlockEntity r = rack(p);
+        r.drives.setItem(0, cart("cartridge_gold"));
+        r.setEnergy(r.maxEnergy());
+        place(p.east(), "storage_terminal");
+        tick(r);
+        net(p).insert(new ItemStack(Items.COBBLESTONE, 100));
+        var player = new net.minecraft.server.level.ServerPlayer(level.getServer(), level,
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "selftest"), net.minecraft.server.level.ClientInformation.createDefault());
+        com.itmecasey.barelystorage.menu.TerminalMenu menu = new com.itmecasey.barelystorage.menu.TerminalMenu(com.itmecasey.barelystorage.menu.TerminalMenu.Kind.STORAGE, 5, 1,
+                player.getInventory(), level, p.east());
+        menu.broadcastChanges();
+        int slot = -1;
+        for (int i = 0; i < menu.viewSlots(); i++) {
+            if (menu.slots.get(i).getItem().is(Items.COBBLESTONE)) {
+                slot = i;
+            }
+        }
+        verdict("terminal_list_shows_the_stored_item", slot >= 0 && menu.countAt(slot) == 100, "slot=" + slot + " shown=" + (slot >= 0 ? menu.countAt(slot) : -1) + " pool=" + net(p).pool().count(key(Items.COBBLESTONE)));
+        long before = net(p).pool().count(key(Items.COBBLESTONE));
+        menu.clicked(slot, 0, net.minecraft.world.inventory.ContainerInput.QUICK_MOVE, player);
+        long afterShift = net(p).pool().count(key(Items.COBBLESTONE));
+        int held = 0;
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            if (player.getInventory().getItem(i).is(Items.COBBLESTONE)) {
+                held += player.getInventory().getItem(i).getCount();
+            }
+        }
+        verdict("shift_click_takes_a_stack_out_of_the_network", before - afterShift == 64 && held == 64, "network " + before + " -> " + afterShift + ", player holds " + held);
+        menu.clicked(slot, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        long afterClick = net(p).pool().count(key(Items.COBBLESTONE));
+        verdict("single_click_takes_one_item_out_of_the_network", afterShift - afterClick == 1 && menu.getCarried().getCount() == 1,
+                "network " + afterShift + " -> " + afterClick + ", carried " + menu.getCarried().getCount());
+        menu.broadcastChanges();
+        ItemStack driveStack = r.drives.getItem(0);
+        long inItem = com.itmecasey.barelystorage.item.CartridgeItem.read(driveStack, ((com.itmecasey.barelystorage.item.CartridgeItem) driveStack.getItem()).tier()).count(key(Items.COBBLESTONE));
+        int shownNow = 0;
+        for (int i = 0; i < menu.viewSlots(); i++) {
+            if (menu.slots.get(i).getItem().is(Items.COBBLESTONE)) {
+                shownNow += (int) menu.countAt(i);
+            }
+        }
+        verdict("taken_items_are_gone_from_the_cartridge_item_and_the_list", inItem == afterClick && shownNow == afterClick,
+                "item=" + inItem + " pool=" + afterClick + " listShows=" + shownNow);
+        clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
     }
 
     private static void filtersAndUpgrades(BlockPos p) {

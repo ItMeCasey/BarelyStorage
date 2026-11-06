@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * One menu for every machine with upgrade cards: Assembler (crafting patterns), Interface Node (processing patterns and the 3x3
+ * One menu for every machine with upgrade cards: Assembler (crafting patterns), Interface Node (processing patterns and the 1x9
  * buffer), Storage Bus (filter and priority), Import and Export Node (filter). Rows of pattern or filter slots beyond the first
  * are locked until Capacity or Filter cards open them.
  */
@@ -57,7 +57,7 @@ public class NodeMenu extends StorageMenu {
         this.upgradeX = 176 + 8;
         this.upgradeY = 30;
         this.areaX = 8;
-        this.areaY = tall ? 98 : 30;
+        this.areaY = tall ? 62 : 30;
         this.bufferX = 8;
         this.bufferY = 30;
         for (int i = 0; i < UPGRADES; i++) {
@@ -74,10 +74,8 @@ public class NodeMenu extends StorageMenu {
             });
         }
         if (buffer != null) {
-            for (int row = 0; row < 3; row++) {
-                for (int col = 0; col < 3; col++) {
-                    addSlot(new Slot(buffer, col + row * 3, bufferX + col * 18, bufferY + row * 18));
-                }
+            for (int col = 0; col < 9; col++) {
+                addSlot(new Slot(buffer, col, bufferX + col * 18, bufferY));
             }
         }
         for (int row = 0; row < UpgradeableBlockEntity.MAX_ROWS; row++) {

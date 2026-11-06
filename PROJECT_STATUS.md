@@ -1,6 +1,6 @@
 # Project Status
 <!-- status-format: 1 -->
-Updated: 2026-11-05
+Updated: 2026-11-06
 Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
 Spend: none
 
@@ -8,7 +8,7 @@ Spend: none
 - [x] Layout: shared common/ plus master version-26.2 code synced to 26.1.2 and 26.3, and six loader layers (w:3)
 - [x] Gradle builds compile on Forge and NeoForge for 26.1.2, 26.2 and 26.3 (w:4)
 - [x] 32 unit tests for storage, priority routing, graph, planner (including tag substitutes), scheduler, persistence and power (w:4)
-- [x] Headless server self test, 28 checks, SELFTEST DONE failures=0 on all six layers (w:4)
+- [x] Headless server self test, 32 checks, SELFTEST DONE failures=0 on all six layers (w:4)
 - [ ] Combined jar per Minecraft version with a dev-tools-out-of-release check (w:3)
 - [~] GitHub repository (public repo exists, first commit pushed; later commits local until the PM pushes) (w:1)
 
@@ -29,7 +29,7 @@ Spend: none
 - [x] CPU and RAM blades, Thread Exhaustion and Out of Memory halts, resume on new hardware (w:5)
 
 ## Art and models
-- [x] Blockbench models for rack, terminals, assembler, cable and nodes; original textures drawn by script (w:5)
+- [x] Blockbench models for rack, terminals, assembler, cable and nodes inside 16x16x16, 3D item views, straight cable with matching hit boxes (headless and unit checks only; not yet seen in a client) (w:5)
 - [x] GUI font Liberation Sans (OFL) as a TrueType font, flat dark and light themes (w:2)
 - [~] GUI frames seen on a client: NeoForge 26.2 all screens; other five layers not yet (w:4)
 

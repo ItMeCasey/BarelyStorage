@@ -24,7 +24,7 @@ final class GlyphButton extends AbstractWidget {
     private Component lastTip;
 
     GlyphButton(int x, int y, Supplier<String> icon, Runnable action, Supplier<Component> tip) {
-        this(x, y, 14, icon, action, tip, () -> false);
+        this(x, y, 16, icon, action, tip, () -> false);
     }
 
     GlyphButton(int x, int y, int size, Supplier<String> icon, Runnable action, Supplier<Component> tip, BooleanSupplier lit) {

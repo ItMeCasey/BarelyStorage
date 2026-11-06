@@ -27,7 +27,7 @@ public class QueueScreen extends AbstractContainerScreen<QueueMenu> {
         cancels.clear();
         for (int i = 0; i < QueueMenu.JOBS; i++) {
             final int job = i;
-            GlyphButton b = new GlyphButton(leftPos + 154, topPos + 31 + i * 20, 14, () -> "cancel", () -> {
+            GlyphButton b = new GlyphButton(leftPos + 154, topPos + 31 + i * 20, 16, () -> "cancel", () -> {
                 if (minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, job);
                 }

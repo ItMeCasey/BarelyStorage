@@ -36,6 +36,17 @@ public class StorageJeiPlugin implements IModPlugin {
     }
 
     @Override
+    public void onRuntimeAvailable(mezz.jei.api.runtime.IJeiRuntime runtime) {
+        com.itmecasey.barelystorage.client.SearchSync.register(() -> runtime.getIngredientFilter().getFilterText(),
+                text -> runtime.getIngredientFilter().setFilterText(text));
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        com.itmecasey.barelystorage.client.SearchSync.register(null, null);
+    }
+
+    @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
         for (TerminalMenu.Kind kind : new TerminalMenu.Kind[] {TerminalMenu.Kind.CRAFTING, TerminalMenu.Kind.PATTERN}) {
             for (int rows : TerminalMenu.ROWS) {

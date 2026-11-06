@@ -279,6 +279,7 @@ LANG = {
     "gui.barelystorage.tip_sort": "Sort by: %s",
     "gui.barelystorage.tip_order": "Order: %s",
     "gui.barelystorage.tip_view": "View: %s",
+    "gui.barelystorage.tip_sync": "Sync search with the recipe viewer (both ways while lit)",
     "gui.barelystorage.size_0": "Small",
     "gui.barelystorage.size_1": "Medium",
     "gui.barelystorage.size_2": "Large",

@@ -19,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 public class StorageReiPlugin implements REIClientPlugin {
     @Override
     public void registerTransferHandlers(TransferHandlerRegistry registry) {
+        com.itmecasey.barelystorage.client.SearchSync.register(() -> me.shedaniel.rei.api.client.REIRuntime.getInstance().getSearchTextField().getText(),
+                text -> me.shedaniel.rei.api.client.REIRuntime.getInstance().getSearchTextField().setText(text));
         registry.register(context -> {
             if (!(context.getMenu() instanceof TerminalMenu menu) || !ViewerFill.accepts(menu)) {
                 return TransferHandler.Result.createNotApplicable();

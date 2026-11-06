@@ -18,10 +18,38 @@ def load(name):
         return json.load(f)
 
 
+DISPLAY = {
+    "gui": {"rotation": [30, 45, 0], "translation": [0, 0, 0], "scale": [0.625, 0.625, 0.625]},
+    "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.25, 0.25, 0.25]},
+    "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]},
+    "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+    "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
+    "firstperson_lefthand": {"rotation": [0, 225, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
+}
+
+
+def fit(elements):
+    """Keeps a block model inside 0..16 on every axis (no overlap with the neighbor block, so no z-fighting where machines touch)."""
+    elements = [e for e in elements if e["from"][1] < 16 or e["name"].startswith("tray")]
+    for axis in range(3):
+        lo = min(e["from"][axis] for e in elements)
+        hi = max(e["to"][axis] for e in elements)
+        if lo >= 0 and hi <= 16:
+            continue
+        lo, hi = min(lo, 0), max(hi, 16)
+        k = 16 / (hi - lo)
+        for e in elements:
+            e["from"][axis] = round((e["from"][axis] - lo) * k, 3)
+            e["to"][axis] = round((e["to"][axis] - lo) * k, 3)
+    return elements
+
+
 def save(kind, name, model, particle):
+    if kind == "block":
+        model["elements"] = fit(model["elements"])
     textures = {k: f"{MOD}:block/{v}" for k, v in model["textures"].items()}
     textures["particle"] = f"{MOD}:block/{particle}"
-    out = {"textures": textures, "elements": model["elements"]}
+    out = {"textures": textures, "elements": model["elements"], "display": DISPLAY}
     os.makedirs(os.path.join(OUT, kind), exist_ok=True)
     with open(os.path.join(OUT, kind, name + ".json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(out, f, indent=2)

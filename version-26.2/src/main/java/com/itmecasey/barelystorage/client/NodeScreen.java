@@ -23,7 +23,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
     protected void init() {
         super.init();
         if (menu.layout() == NodeMenu.Layout.BUS) {
-            addRenderableWidget(new GlyphButton(leftPos + 156, topPos + 4, 14, () -> "priority_" + menu.priority(), () -> {
+            addRenderableWidget(new GlyphButton(leftPos + 156, topPos + 4, 16, () -> "priority_" + menu.priority(), () -> {
                 if (minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, NodeMenu.BTN_PRIORITY);
                 }
@@ -43,6 +43,10 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
                 g.fill(leftPos + s.x + 2, topPos + s.y + 2, leftPos + s.x + 14, topPos + s.y + 14, 0xFF0A0912);
             } else {
                 Ui.slot(g, leftPos + s.x, topPos + s.y);
+                if (s.index < NodeMenu.UPGRADES && !s.hasItem()) {
+                    g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, GlyphButton.iconId("upgrade_hint"), leftPos + s.x + 2, topPos + s.y + 2,
+                            0.0F, 0.0F, 12, 12, 12, 12, 0x66C8C8D8);
+                }
             }
         }
     }

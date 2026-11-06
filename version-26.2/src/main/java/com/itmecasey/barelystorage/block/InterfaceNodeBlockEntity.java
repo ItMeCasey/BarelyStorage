@@ -20,7 +20,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * An Interface Node: holds the processing patterns of the machine it faces, and a 3x3 buffer the network fills with that
+ * An Interface Node: holds the processing patterns of the machine it faces, and a 1x9 buffer the network fills with that
  * machine's ingredients. The node feeds the buffer into the machine.
  */
 public class InterfaceNodeBlockEntity extends UpgradeableBlockEntity {
