@@ -1,0 +1,53 @@
+name: Wrong amounts
+description: A terminal, rack or craft shows or does something different from what the wiki and config say.
+title: "[Amounts] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Open the rack screen and note its power bar, drive usage and the CPU and RAM line. Please include them, and the layout (cables, nodes, terminals).
+  - type: input
+    id: block
+    attributes:
+      label: Which block
+      placeholder: Storage Terminal, Server Rack, Interface Node
+    validations:
+      required: true
+  - type: textarea
+    id: shown
+    attributes:
+      label: What you see
+      description: The numbers or message on screen, or a screenshot.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and why
+      description: The number from the wiki or your config file.
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Changes to config/barelystorage.properties
+      description: Only the lines you changed, if any.
+  - type: input
+    id: version
+    attributes:
+      label: BarelyStorage version
+    validations:
+      required: true
+  - type: input
+    id: minecraft
+    attributes:
+      label: Minecraft and loader versions
+      placeholder: Minecraft 26.2, NeoForge ...
+    validations:
+      required: true
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: Especially item viewers, storage or pipe mods.

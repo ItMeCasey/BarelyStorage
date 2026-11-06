@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: How BarelyStorage works and what it covers
+    url: https://itmecasey.com/wiki/barelystorage/
+    about: Every block, the crafting rules, the config file and how storage is worked out. Read this first.
+  - name: Troubleshooting
+    url: https://itmecasey.com/wiki/barelystorage/?p=troubleshooting
+    about: An offline rack, a halted craft and cable setups.
