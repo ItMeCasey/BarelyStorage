@@ -19,7 +19,7 @@ public class PatternItem extends Item {
     private final Type type;
 
     public PatternItem(Type type, Properties properties) {
-        super(properties.stacksTo(type == Type.BLANK ? 64 : 1));
+        super(properties.stacksTo(64));
         this.type = type;
     }
 
@@ -31,6 +31,7 @@ public class PatternItem extends Item {
         CompoundTag tag = new CompoundTag();
         tag.putString("p", pattern.encode());
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        stack.set(DataComponents.MAX_STACK_SIZE, 1);
     }
 
     @Nullable

@@ -65,12 +65,14 @@ def blockstates():
                 v["y"] = y
             variants[f"facing={facing}"] = v
         write(os.path.join(bs, block + ".json"), {"variants": variants})
-    for block in ("storage_bus", "interface_node", "import_node"):
-        variants = {}
+    for block in ("storage_bus", "interface_node", "import_node", "export_node"):
         rot = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
+        parts = []
         for facing, r in rot.items():
-            variants[f"facing={facing}"] = dict({"model": model_ref(block)}, **r)
-        write(os.path.join(bs, block + ".json"), {"variants": variants})
+            parts.append({"when": {"facing": facing}, "apply": dict({"model": model_ref(block)}, **r)})
+        for d, r in rot.items():
+            parts.append({"when": {d: "true"}, "apply": dict({"model": model_ref("rack_bus_cable_arm")}, **r)})
+        write(os.path.join(bs, block + ".json"), {"multipart": parts})
     parts = [{"apply": {"model": model_ref("rack_bus_cable_core")}}]
     for d, r in {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}.items():
         parts.append({"when": {d: "true"}, "apply": dict({"model": model_ref("rack_bus_cable_arm")}, **r)})

@@ -39,7 +39,11 @@ public class NodeBlock extends BaseEntityBlock implements NetNode {
     public NodeBlock(Kind kind, Properties properties) {
         super(properties);
         this.kind = kind;
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        BlockState state = stateDefinition.any().setValue(FACING, Direction.NORTH);
+        for (Direction d : Direction.values()) {
+            state = state.setValue(CableBlock.property(d), false);
+        }
+        registerDefaultState(state);
     }
 
     public Kind kind() {
@@ -50,13 +54,39 @@ public class NodeBlock extends BaseEntityBlock implements NetNode {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+        for (Direction d : Direction.values()) {
+            builder.add(CableBlock.property(d));
+        }
+    }
+
+    /** Which sides have a cable or other node to join, so the model can draw an arm toward it. */
+    private BlockState withConnections(net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockState state) {
+        Direction facing = state.getValue(FACING);
+        for (Direction d : Direction.values()) {
+            BlockState n = level.getBlockState(pos.relative(d));
+            boolean joined = d != facing && n.getBlock() instanceof NetNode node && node.connects(n, d.getOpposite());
+            state = state.setValue(CableBlock.property(d), joined);
+        }
+        return state;
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable net.minecraft.world.level.redstone.Orientation orientation, boolean moved) {
+        super.neighborChanged(state, level, pos, block, orientation, moved);
+        if (!level.isClientSide()) {
+            BlockState next = withConnections(level, pos, state);
+            if (next != state) {
+                level.setBlock(pos, next, 3);
+            }
+            StorageNetwork.invalidate();
+        }
     }
 
     /** The node faces the block it was placed against. */
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
+        return withConnections(context.getLevel(), context.getClickedPos(), defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite()));
     }
 
     @Override

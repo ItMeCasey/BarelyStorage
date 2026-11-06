@@ -1,27 +1,110 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "barelystorage:block/storage_bus"
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "barelystorage:block/storage_bus"
+      }
     },
-    "facing=east": {
-      "model": "barelystorage:block/storage_bus",
-      "y": 90
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "barelystorage:block/storage_bus",
+        "y": 90
+      }
     },
-    "facing=south": {
-      "model": "barelystorage:block/storage_bus",
-      "y": 180
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "barelystorage:block/storage_bus",
+        "y": 180
+      }
     },
-    "facing=west": {
-      "model": "barelystorage:block/storage_bus",
-      "y": 270
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "barelystorage:block/storage_bus",
+        "y": 270
+      }
     },
-    "facing=up": {
-      "model": "barelystorage:block/storage_bus",
-      "x": 270
+    {
+      "when": {
+        "facing": "up"
+      },
+      "apply": {
+        "model": "barelystorage:block/storage_bus",
+        "x": 270
+      }
     },
-    "facing=down": {
-      "model": "barelystorage:block/storage_bus",
-      "x": 90
+    {
+      "when": {
+        "facing": "down"
+      },
+      "apply": {
+        "model": "barelystorage:block/storage_bus",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "barelystorage:block/rack_bus_cable_arm"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "barelystorage:block/rack_bus_cable_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "barelystorage:block/rack_bus_cable_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "barelystorage:block/rack_bus_cable_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "barelystorage:block/rack_bus_cable_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "barelystorage:block/rack_bus_cable_arm",
+        "x": 90
+      }
     }
-  }
+  ]
 }

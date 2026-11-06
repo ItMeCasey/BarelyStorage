@@ -48,7 +48,12 @@ def main():
     save("block", "rack_bus_cable_arm", load("rack_bus_cable_arm"), "rack_bus_cable")
     save("item", "rack_bus_cable", load("rack_bus_cable_item"), "rack_bus_cable")
     for n in ("storage_bus", "interface_node", "import_node"):
-        save("block", n, load(n), n)
+        model = load(n)
+        for el in model["elements"]:
+            if el["name"] == "tab":
+                el["from"] = [6.5, 6.5, 5]
+                el["to"] = [9.5, 9.5, 9.5]
+        save("block", n, model, n)
     print("imported models")
 
 
