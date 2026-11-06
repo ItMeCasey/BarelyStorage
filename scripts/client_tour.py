@@ -35,9 +35,9 @@ def tour(layer):
     shots = run / "screenshots"
     if shots.exists():
         shutil.rmtree(shots)
-    env = dict(os.environ, BARELYSTORAGE_SHOTS="1")
+    env = dict(os.environ, BARELYSTORAGE_SHOTS=os.environ.get("BARELYSTORAGE_MODE", "1"))
     log = []
-    proc = subprocess.Popen(["cmd", "/c", str(folder / "gradlew.bat"), "runClient", "--no-daemon", "-q", "-PdevTools"] + (["-Pviewers=" + os.environ["BARELYSTORAGE_VIEWERS"]] if os.environ.get("BARELYSTORAGE_VIEWERS") else []), cwd=folder,
+    proc = subprocess.Popen(["cmd", "/c", str(folder / "gradlew.bat"), "runClient", "--no-daemon", "-q", "-PdevTools"] + (["-Pviewers=" + os.environ["BARELYSTORAGE_VIEWERS"]] if os.environ.get("BARELYSTORAGE_VIEWERS") else []) + (["-PbeiJar=" + os.environ["BARELYSTORAGE_BEI_JAR"]] if os.environ.get("BARELYSTORAGE_BEI_JAR") else []), cwd=folder,
                             env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
 
     def pump():

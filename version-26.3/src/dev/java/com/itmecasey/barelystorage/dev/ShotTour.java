@@ -53,6 +53,7 @@ public final class ShotTour {
     private static final Logger LOGGER = LoggerFactory.getLogger("BarelyStorage");
     private static final boolean ENABLED = System.getenv("BARELYSTORAGE_SHOTS") != null;
     private static final boolean PLAY = "play".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean BEI = "bei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -220,6 +221,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (BEI) {
+            beiSteps(y);
+            return;
+        }
         if (PLAY) {
             then(10, () -> {
                 StringBuilder sb = new StringBuilder();
@@ -306,6 +311,88 @@ public final class ShotTour {
         then(2, () -> close());
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
+        then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    // ---- BEI recipe popup and the plus button (reached by reflection: BEI is not a compile dependency) ----
+
+    private static Object beiStatic(String field) throws ReflectiveOperationException {
+        var f = Class.forName("com.itmecasey.bei.client.RecipePopup").getDeclaredField(field);
+        f.setAccessible(true);
+        return f.get(null);
+    }
+
+    private static void beiOpenBread() {
+        try {
+            Class.forName("com.itmecasey.bei.client.RecipePopup").getMethod("open", Item.class, boolean.class).invoke(null, Items.BREAD, false);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("BARELYSTORAGE-SHOTS bei open failed", e);
+        }
+    }
+
+    private static void beiReport(String label) {
+        try {
+            List<?> plus = (List<?>) beiStatic("PLUS");
+            List<?> dimmed = (List<?>) beiStatic("DIMMED");
+            LOGGER.info("BARELYSTORAGE-SHOTS bei {}: plus buttons={} dimmed={} screen={}", label, plus.size(), dimmed.size(),
+                    Minecraft.getInstance().gui.screen() == null ? "none" : Minecraft.getInstance().gui.screen().getClass().getSimpleName());
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("BARELYSTORAGE-SHOTS bei report failed", e);
+        }
+    }
+
+    private static void beiClickPlus() {
+        try {
+            List<?> plus = (List<?>) beiStatic("PLUS");
+            if (plus.isEmpty()) {
+                LOGGER.error("BARELYSTORAGE-SHOTS bei click: no plus button drawn");
+                return;
+            }
+            Object first = plus.get(0);
+            var rx = first.getClass().getDeclaredMethod("x");
+            var ry = first.getClass().getDeclaredMethod("y");
+            rx.setAccessible(true);
+            ry.setAccessible(true);
+            int x = (Integer) rx.invoke(first) + 6;
+            int yy = (Integer) ry.invoke(first) + 6;
+            var event = new net.minecraft.client.input.MouseButtonEvent(x, yy, new net.minecraft.client.input.MouseButtonInfo(0, 0));
+            Object consumed = Class.forName("com.itmecasey.bei.client.RecipePopup").getMethod("mouseClicked", net.minecraft.client.input.MouseButtonEvent.class).invoke(null, event);
+            LOGGER.info("BARELYSTORAGE-SHOTS bei click at {},{} consumed={}", x, yy, consumed);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("BARELYSTORAGE-SHOTS bei click failed", e);
+        }
+    }
+
+    private static void beiSteps(int y) {
+        then(30, () -> moveTo(new Vec3(4.5, y + 1.0, -2.0), new Vec3(4.5, y + 0.5, 0.5)));
+        then(10, () -> open(new BlockPos(4, y, 0)));
+        then(30, ShotTour::beiOpenBread);
+        then(20, () -> beiReport("pattern terminal"));
+        shoot("bei_plus_enabled", 5);
+        then(2, ShotTour::beiClickPlus);
+        then(15, () -> onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            if (p.containerMenu instanceof TerminalMenu menu) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < TerminalMenu.GRID; i++) {
+                    sb.append(menu.slots.get(menu.viewSlots() + i).getItem().getItem().getDescriptionId()).append(' ');
+                }
+                LOGGER.info("BARELYSTORAGE-SHOTS bei grid after click: {}", sb);
+            }
+        }));
+        shoot("bei_grid_after_click", 5);
+        then(2, () -> close());
+        then(10, () -> Minecraft.getInstance().gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(player())));
+        then(20, ShotTour::beiOpenBread);
+        then(20, () -> beiReport("inventory screen"));
+        shoot("bei_plus_inventory", 5);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
