@@ -51,6 +51,7 @@ def v2612(text):
     text = text.replace("minecraft.gui.hud.getChat()", "minecraft.gui.getChat()").replace("minecraft.gui.toastManager()", "minecraft.getToastManager()")
     text = text.replace("minecraft.gameRenderer.mainRenderTarget()", "minecraft.getMainRenderTarget()")
     text = text.replace("Minecraft.getInstance().gui.screen()", "Minecraft.getInstance().screen").replace("mc.gui.screen()", "mc.screen")
+    text = text.replace("Minecraft.getInstance().gui.setScreen(", "Minecraft.getInstance().setScreen(")
     return text
 
 

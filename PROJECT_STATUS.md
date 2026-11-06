@@ -1,6 +1,6 @@
 # Project Status
 <!-- status-format: 1 -->
-Updated: 2026-11-06
+Updated: 2026-11-05
 Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
 Spend: none
 
@@ -31,7 +31,7 @@ Spend: none
 ## Art and models
 - [x] Blockbench models for rack, terminals, assembler, cable and nodes inside 16x16x16, 3D item views, straight cable with matching hit boxes (headless and unit checks only; not yet seen in a client) (w:5)
 - [x] GUI font Liberation Sans (OFL) as a TrueType font, flat dark and light themes (w:2)
-- [~] GUI frames seen on a client: NeoForge 26.2 all screens; other five layers not yet (w:4)
+- [x] GUI frames seen on a client: all 22 tour frames on NeoForge 26.2, and tours passed on the other five layers (frames read: room overview and terminals) (w:4)
 
 ## Compatibility
 - [~] SMWTI plugin for rack, nodes and assembler (loaded from the Maven mirror; lines not yet viewed) (w:3)

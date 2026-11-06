@@ -451,7 +451,7 @@ public final class ShotTour {
         }));
         shoot("bei_grid_after_click", 5);
         then(2, () -> close());
-        then(10, () -> Minecraft.getInstance().gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(player())));
+        then(10, () -> Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(player())));
         then(20, ShotTour::beiOpenBread);
         then(20, () -> beiReport("inventory screen"));
         shoot("bei_plus_inventory", 5);
