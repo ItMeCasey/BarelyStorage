@@ -35,8 +35,19 @@ final class GlyphButton extends AbstractWidget {
         this.lit = lit;
     }
 
+    /** The sprite for the current GUI scale (1 to 5), drawn so one texture pixel is one screen pixel. */
     static Identifier iconId(String name) {
-        return ModContent.id("textures/gui/icon/" + name + ".png");
+        int scale = Math.max(1, Math.min(5, (int) Math.round(net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale())));
+        return ModContent.id("textures/gui/icon/" + name + "_s" + scale + ".png");
+    }
+
+    static int iconPixels() {
+        return 12 * Math.max(1, Math.min(5, (int) Math.round(net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale())));
+    }
+
+    static void drawIcon(GuiGraphicsExtractor g, String name, int x, int y, int tint) {
+        int px = iconPixels();
+        g.blit(RenderPipelines.GUI_TEXTURED, iconId(name), x, y, 0.0F, 0.0F, 12, 12, px, px, px, px, tint);
     }
 
     @Override
@@ -54,7 +65,7 @@ final class GlyphButton extends AbstractWidget {
         g.fill(x, y, x + width, y + height, border);
         g.fill(x + 1, y + 1, x + width - 1, y + height - 1, hover ? Ui.PANEL : Ui.SLOT);
         int tint = hover || on ? Ui.GOLD : Ui.TEXT;
-        g.blit(RenderPipelines.GUI_TEXTURED, iconId(icon.get()), x + (width - 12) / 2, y + (height - 12) / 2, 0.0F, 0.0F, 12, 12, 12, 12, tint);
+        drawIcon(g, icon.get(), x + (width - 12) / 2, y + (height - 12) / 2, tint);
         Component now = tip.get();
         if (!now.equals(lastTip)) {
             lastTip = now;

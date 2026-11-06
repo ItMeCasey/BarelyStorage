@@ -44,8 +44,7 @@ public class NodeScreen extends AbstractContainerScreen<NodeMenu> {
             } else {
                 Ui.slot(g, leftPos + s.x, topPos + s.y);
                 if (s.index < NodeMenu.UPGRADES && !s.hasItem()) {
-                    g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, GlyphButton.iconId("upgrade_hint"), leftPos + s.x + 2, topPos + s.y + 2,
-                            0.0F, 0.0F, 12, 12, 12, 12, 0x66C8C8D8);
+                    GlyphButton.drawIcon(g, "upgrade_hint", leftPos + s.x + 2, topPos + s.y + 2, 0x66C8C8D8);
                 }
             }
         }
