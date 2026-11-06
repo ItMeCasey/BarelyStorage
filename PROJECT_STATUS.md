@@ -1,6 +1,6 @@
 # Project Status
 <!-- status-format: 1 -->
-Updated: 2026-11-05
+Updated: 2026-11-06
 Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
 Spend: none
 
@@ -9,7 +9,7 @@ Spend: none
 - [x] Gradle builds compile on Forge and NeoForge for 26.1.2, 26.2 and 26.3 (w:4)
 - [x] 32 unit tests for storage, priority routing, graph, planner (including tag substitutes), scheduler, persistence and power (w:4)
 - [x] Headless server self test, 33 checks, SELFTEST DONE failures=0 on all six layers (w:4)
-- [ ] Combined jar per Minecraft version with a dev-tools-out-of-release check (w:3)
+- [x] Combined jar per Minecraft version with a dev-tools-out-of-release check (CI dry run and release built three jars, none with dev files) (w:3)
 - [~] GitHub repository (public repo exists, first commit pushed; later commits local until the PM pushes) (w:1)
 
 ## Core
@@ -40,6 +40,8 @@ Spend: none
 - [ ] Item viewers show items and recipes per version (checked loading only) (w:3)
 
 ## Docs, branding, release
-- [ ] Branding: icon, banners, LISTING.md, curseforge/DESCRIPTION.md (w:3)
-- [ ] Docs, README, wiki pages in the site repo (w:3)
-- [ ] CI build.yml, release.yml, publish script, issue templates (w:3)
+- [x] Branding: icon, banners, LISTING.md, curseforge/DESCRIPTION.md (w:3)
+- [x] Docs, README, wiki pages in the site repo (21 pages, deployed and checked live 2026-11-06) (w:3)
+- [x] CI build.yml, release.yml, publish script, issue templates (green builds, dry run and release run) (w:3)
+- [x] First release v2026.11.1: GitHub prerelease and three CurseForge betas (project 1786861, file ids 9472566-9472568) (w:2)
+- [ ] CurseForge approval of the 2026.11.1 files (Casey / CurseForge review) (w:1)
