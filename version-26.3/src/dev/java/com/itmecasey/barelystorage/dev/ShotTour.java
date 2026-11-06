@@ -57,6 +57,7 @@ public final class ShotTour {
     private static final boolean SEARCH = "search".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean LOOK = "look".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean SCALES = "scales".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean JEI = "jei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -224,6 +225,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (JEI) {
+            jeiSteps(y);
+            return;
+        }
         if (SCALES) {
             scaleSteps(y);
             return;
@@ -326,6 +331,37 @@ public final class ShotTour {
         then(2, () -> close());
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
+        then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    private static void jeiSteps(int y) {
+        then(30, () -> moveTo(new Vec3(5.5, y + 2.0, -2.0), new Vec3(5.5, y + 1.5, 0.5)));
+        then(10, () -> open(new BlockPos(5, y + 1, 0)));
+        then(60, () -> {
+            try {
+                Class.forName("com.itmecasey.barelystorage.neoforge.dev.JeiProbe").getMethod("run", net.minecraft.client.gui.screens.Screen.class).invoke(null, Minecraft.getInstance().gui.screen());
+            } catch (ReflectiveOperationException e) {
+                LOGGER.error("BARELYSTORAGE-SHOTS jei probe failed", e);
+            }
+        });
+        then(15, () -> onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            if (p.containerMenu instanceof TerminalMenu menu) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < TerminalMenu.GRID; i++) {
+                    sb.append(menu.slots.get(menu.viewSlots() + i).getItem().getItem().getDescriptionId()).append(' ');
+                }
+                LOGGER.info("BARELYSTORAGE-SHOTS jei grid after transfer: {}", sb);
+            }
+        }));
+        shoot("jei_grid_after_transfer", 5);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();

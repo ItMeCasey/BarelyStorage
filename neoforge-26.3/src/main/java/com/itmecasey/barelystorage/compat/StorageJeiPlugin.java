@@ -29,6 +29,9 @@ import org.jetbrains.annotations.Nullable;
 /** JEI: the plus button of a crafting recipe fills the grid of a Crafting or Pattern Terminal. Loaded only when JEI is installed. */
 @JeiPlugin
 public class StorageJeiPlugin implements IModPlugin {
+    /** JEI's runtime while a world is open; the development tour uses it to run a plus click. */
+    public static volatile mezz.jei.api.runtime.IJeiRuntime runtime;
+
     @Override
     public Identifier getPluginUid() {
         // JEI asks for this while mods are still loading; touching ModContent here would build the blocks too early.
@@ -37,25 +40,25 @@ public class StorageJeiPlugin implements IModPlugin {
 
     @Override
     public void onRuntimeAvailable(mezz.jei.api.runtime.IJeiRuntime runtime) {
+        StorageJeiPlugin.runtime = runtime;
         com.itmecasey.barelystorage.client.SearchSync.register(() -> runtime.getIngredientFilter().getFilterText(),
                 text -> runtime.getIngredientFilter().setFilterText(text));
     }
 
     @Override
     public void onRuntimeUnavailable() {
+        runtime = null;
         com.itmecasey.barelystorage.client.SearchSync.register(null, null);
     }
 
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        for (TerminalMenu.Kind kind : new TerminalMenu.Kind[] {TerminalMenu.Kind.CRAFTING, TerminalMenu.Kind.PATTERN}) {
-            for (int rows : TerminalMenu.ROWS) {
-                registration.addRecipeTransferHandler(new Handler(registration.getTransferHelper(), ModContent.terminalMenu(kind, rows)), RecipeTypes.CRAFTING);
-            }
-        }
+        // One handler for every terminal menu: JEI keeps one handler per menu class and recipe type, so six handlers (one per menu
+        // type) would replace each other and only the last would ever answer.
+        registration.addRecipeTransferHandler(new Handler(registration.getTransferHelper()), RecipeTypes.CRAFTING);
     }
 
-    private record Handler(IRecipeTransferHandlerHelper helper, MenuType<TerminalMenu> type) implements IRecipeTransferHandler<TerminalMenu, RecipeHolder<CraftingRecipe>> {
+    private record Handler(IRecipeTransferHandlerHelper helper) implements IRecipeTransferHandler<TerminalMenu, RecipeHolder<CraftingRecipe>> {
         @Override
         public Class<? extends TerminalMenu> getContainerClass() {
             return TerminalMenu.class;
@@ -63,7 +66,7 @@ public class StorageJeiPlugin implements IModPlugin {
 
         @Override
         public Optional<MenuType<TerminalMenu>> getMenuType() {
-            return Optional.of(type);
+            return Optional.empty();
         }
 
         @Override
