@@ -16,7 +16,7 @@ BarelyStorage is a physical storage network. A Server Rack takes Forge Energy an
 - **Crafting Queue Terminal:** shows running jobs and halts, and lets you cancel.
 - **Assembler:** crafts from patterns and takes up to four upgrade cards.
 - **Interface, Import and Export Nodes, and the Storage Bus:** feed machines, pull items in, push items out and map a chest or tank into the network. Each has an upgrade and filter screen.
-- **Upgrade cards:** Speed, Capacity, Efficiency and Filter.
+- **Upgrade cards:** Speed, Capacity, Efficiency (takes 10 percent off every rack's upkeep per card, up to 50) and Filter.
 - **CPU and RAM blades:** the Basic Core, the Multi-Threaded RAM Blade and the Quantum Core set threads, RAM and how deep a pattern chain can go. Run out and the job halts with Thread Exhaustion or Out of Memory until you add hardware.
 
 ![How the network works](https://raw.githubusercontent.com/ItMeCasey/BarelyStorage/main/branding/banners/network.png)
@@ -30,12 +30,12 @@ Power use, drive sizes, hardware, crafting speed and node speed are all in `conf
 - Takes plain Forge Energy through the loader's energy interface, so any cable mod can feed a rack.
 - The plus button of JEI, REI and BEI fills the Crafting Terminal's grid or encodes a pattern in the Pattern Terminal. JEI and REI work on NeoForge only for now.
 - The terminal's search can follow the recipe viewer's search box (JEI, REI and BEI), both ways.
-- Optional Show Me What This Is plugin for racks, nodes and assemblers.
+- Optional Show Me What This Is plugin and Jade plugin (NeoForge) for racks, nodes and assemblers.
 - EMI has no build for these Minecraft versions yet.
 
 The pictures on this page are illustrations drawn for the listing, not game screenshots.
 
-**Tested:** every layer (Forge and NeoForge on 26.1.2, 26.2 and 26.3) compiles and passes a headless server self test of 32 checks (storage, priority routing, nodes, filters, patterns and crafting, hardware halts, terminal clicks, power) plus 32 unit tests of the shared logic. Each layer was run in a real client with a scripted tour that photographs the room and every screen. The BEI plus button and the BEI search sync were checked in a real client on NeoForge 26.2 only. The JEI and REI plus buttons were run in a real client on NeoForge 26.2 (the Bread recipe fills the Crafting Terminal grid). The Show Me What This Is lines, taking items out through the terminal in a real client, multiplayer and long play sessions have not been checked yet.
+**Tested:** every layer (Forge and NeoForge on 26.1.2, 26.2 and 26.3) compiles and passes a headless server self test of 33 checks (storage, priority routing, nodes, filters, patterns and crafting, hardware halts, terminal clicks, power) plus 32 unit tests of the shared logic. Each layer was run in a real client with a scripted tour that photographs the room and every screen. The BEI plus button and the BEI search sync were checked in a real client on NeoForge 26.2 only. The JEI and REI plus buttons were run in a real client on NeoForge 26.2 (the Bread recipe fills the Crafting Terminal grid). The Show Me What This Is lines, taking items out through the terminal in a real client, multiplayer and long play sessions have not been checked yet.
 
 # FAQ
 
