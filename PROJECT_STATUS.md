@@ -36,7 +36,7 @@ Spend: none
 ## Compatibility
 - [x] SMWTI plugin: Server Rack lines (energy, power, drives, CPU) seen on all six layers; Assembler, Interface Node, Storage Bus and Import Node lines seen on NeoForge 26.2 (rack line is Upkeep, no duplicate power bar); Jade plugin for rack and nodes on the NeoForge layers (rack and interface node seen on NeoForge 26.2) (w:3)
 - [x] JEI and REI plus buttons for the Crafting and Pattern terminals (NeoForge layers; the handler call for the Bread recipe was run in a real client on NeoForge 26.2 and fills the grid for both viewers; JEI needed a fix: one handler for all terminal menus; the other NeoForge versions compile only) (w:4)
-- [x] BEI plus button (seen on NeoForge 26.2: enabled in the Pattern Terminal, fills the grid, hidden in the inventory; other layers compile only); search sync with BEI (seen on NeoForge 26.2 both ways), JEI and REI hooked (compile only); EMI (no build for 26.x) and Jade plugin still open (w:3)
+- [x] BEI plus button (seen on NeoForge 26.2: enabled in the Pattern Terminal, fills the grid, hidden in the inventory; other layers compile only); BEI storage source for the Master Blueprint (compiles on all six; counts the open terminal list only); search sync with BEI (seen on NeoForge 26.2 both ways), JEI and REI hooked (compile only); EMI (no build for 26.x) and Jade plugin still open (w:3)
 - [ ] Item viewers show items and recipes per version (checked loading only) (w:3)
 
 ## Docs, branding, release

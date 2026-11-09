@@ -7,6 +7,7 @@
 - JEI plus button fixed for the Crafting and Pattern Terminals; REI and BEI plus buttons and search sync added.
 - Smaller icons and buttons, Silkscreen font for titles and labels, per-GUI-scale crisp icon sprites.
 - Jade plugin for the rack and nodes (NeoForge).
+- BEI storage source: BEI's Master Blueprint counts the items of the open terminal list (the rows the client has on screen).
 
 ## 2026.11.1
 
