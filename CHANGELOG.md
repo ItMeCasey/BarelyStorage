@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- No mod changes since 2026.11.2: only tests, development tours and documentation. The take, craft and encode clicks of the terminals were run through a real client on NeoForge 26.2, and the JEI plus handler also on NeoForge 26.1.2 and 26.3.
+
 ## 2026.11.2
 
 - Fixed: the top face of the block under a Server Rack, a terminal or an Assembler was invisible (see-through). These blocks now use no full-cube occlusion, like the cable and the nodes.
