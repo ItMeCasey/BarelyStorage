@@ -1,6 +1,6 @@
 # Project Status
 <!-- status-format: 1 -->
-Updated: 2026-11-06
+Updated: 2026-11-09
 Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
 Spend: none
 
@@ -23,8 +23,8 @@ Spend: none
 - [x] Interface Node (patterns for its machine, buffer, upgrades) and Import and Export Nodes with filters (furnace and chest checked headless) (w:5)
 - [x] Assembler with patterns and upgrade slots (headless) (w:4)
 - [x] Upgrade cards: Speed, Capacity, Efficiency (10% off every rack's upkeep per card in the network, max 50%, unit tests and self test), Filter (w:3)
-- [~] Crafting Terminal: grid from network and inventory, red missing ingredients (seen on NeoForge 26.2; craft click not exercised in a client) (w:4)
-- [~] Pattern Terminal: grid, processing outputs, Tags toggle, encode (seen on NeoForge 26.2; encode click not exercised in a client) (w:4)
+- [x] Crafting Terminal: grid from network and inventory, red missing ingredients, result click sent by the client crafts bread (seen on NeoForge 26.2) (w:4)
+- [x] Pattern Terminal: grid, processing outputs, Tags toggle, encode button sent by the client makes a crafting pattern (seen on NeoForge 26.2) (w:4)
 - [x] Crafting Queue Terminal with progress, halt error and cancel (seen on NeoForge 26.2) (w:3)
 - [x] CPU and RAM blades, Thread Exhaustion and Out of Memory halts, resume on new hardware (w:5)
 
@@ -37,7 +37,7 @@ Spend: none
 - [x] SMWTI plugin: Server Rack lines (energy, power, drives, CPU) seen on all six layers; Assembler, Interface Node, Storage Bus and Import Node lines seen on NeoForge 26.2 (rack line is Upkeep, no duplicate power bar); Jade plugin for rack and nodes on the NeoForge layers (rack and interface node seen on NeoForge 26.2) (w:3)
 - [x] JEI and REI plus buttons for the Crafting and Pattern terminals (NeoForge layers; the handler call for the Bread recipe was run in a real client on NeoForge 26.2 and fills the grid for both viewers; JEI needed a fix: one handler for all terminal menus; the other NeoForge versions compile only) (w:4)
 - [x] BEI plus button (seen on NeoForge 26.2: enabled in the Pattern Terminal, fills the grid, hidden in the inventory; other layers compile only); BEI storage source for the Master Blueprint (compiles on all six; counts the open terminal list only); search sync with BEI (seen on NeoForge 26.2 both ways), JEI and REI hooked (compile only); EMI (no build for 26.x) and Jade plugin still open (w:3)
-- [ ] Item viewers show items and recipes per version (checked loading only) (w:3)
+- [~] Item viewers: BEI, JEI and REI plus buttons and BEI search sync run in a client on NeoForge 26.2; other versions and Forge layers load or compile only (w:3)
 
 ## Docs, branding, release
 - [x] Branding: icon, banners, LISTING.md, curseforge/DESCRIPTION.md (w:3)

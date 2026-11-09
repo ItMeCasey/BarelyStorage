@@ -60,6 +60,7 @@ public final class ShotTour {
     private static final boolean JEI = "jei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean REI = "rei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean STACK = "stack".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean CLICKS = "clicks".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -227,6 +228,10 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (CLICKS) {
+            clickSteps(y);
+            return;
+        }
         if (STACK) {
             stackSteps(y);
             return;
@@ -337,6 +342,106 @@ public final class ShotTour {
         then(2, () -> close());
         then(10, () -> open(new BlockPos(4, y + 1, 0)));
         shoot("gui_queue", 40);
+        then(2, () -> close());
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+            LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+            stage = Stage.DONE;
+            minecraft.stop();
+        });
+    }
+
+    /** A click as the real client sends it: through the game mode, so the packet goes to the server. */
+    private static void clientClick(int slot, ContainerInput input) {
+        Minecraft minecraft = Minecraft.getInstance();
+        var screen = minecraft.screen;
+        if (screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> container) {
+            minecraft.gameMode.handleContainerInput(container.getMenu().containerId, slot, 0, input, minecraft.player);
+        }
+    }
+
+    private static void logState(String label, Item item) {
+        onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            ServerLevel level = server.overworld();
+            long network = StorageNetwork.find(level, new BlockPos(0, ground, 0)).pool().count(com.itmecasey.barelystorage.Keys.of(new ItemStack(item), level.registryAccess()));
+            int held = 0;
+            for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+                if (p.getInventory().getItem(i).is(item)) {
+                    held += p.getInventory().getItem(i).getCount();
+                }
+            }
+            if (p.containerMenu.getCarried().is(item)) {
+                held += p.containerMenu.getCarried().getCount();
+            }
+            LOGGER.info("BARELYSTORAGE-SHOTS clicks {}: {} network={} player={}", label, item.getDescriptionId(), network, held);
+        });
+    }
+
+    private static void clickSteps(int y) {
+        // 1. Storage Terminal: shift-click the first list item through the client.
+        then(30, () -> moveTo(new Vec3(2.5, y + 1.0, -2.0), new Vec3(2.5, y + 0.5, 0.5)));
+        then(10, () -> open(new BlockPos(2, y, 0)));
+        then(40, () -> logState("before shift-click", Items.COBBLESTONE));
+        then(10, () -> {
+            var screen = Minecraft.getInstance().screen;
+            if (screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> c && c.getMenu() instanceof TerminalMenu menu) {
+                for (int i = 0; i < menu.viewSlots(); i++) {
+                    if (menu.slots.get(i).getItem().is(Items.COBBLESTONE)) {
+                        clientClick(i, ContainerInput.QUICK_MOVE);
+                        return;
+                    }
+                }
+                LOGGER.error("BARELYSTORAGE-SHOTS clicks: cobblestone not in the list");
+            }
+        });
+        then(30, () -> logState("after shift-click", Items.COBBLESTONE));
+        shoot("clicks_storage_after_take", 2);
+        then(2, () -> close());
+        // 2. Crafting Terminal: three wheat in the top row, click the result.
+        then(10, () -> open(new BlockPos(5, y + 1, 0)));
+        then(20, () -> {
+            setGrid(0, Items.WHEAT);
+            setGrid(1, Items.WHEAT);
+            setGrid(2, Items.WHEAT);
+        });
+        then(30, () -> logState("crafting before", Items.BREAD));
+        then(10, () -> {
+            var screen = Minecraft.getInstance().screen;
+            if (screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> c && c.getMenu() instanceof TerminalMenu menu) {
+                clientClick(menu.resultSlot, ContainerInput.QUICK_MOVE);
+            }
+        });
+        then(30, () -> logState("crafting after shift-click on the result", Items.BREAD));
+        shoot("clicks_crafting_after_craft", 2);
+        then(2, () -> close());
+        // 3. Pattern Terminal: blank pattern in, grid set, press encode through the client.
+        then(10, () -> open(new BlockPos(4, y, 0)));
+        then(20, () -> {
+            setGrid(0, Items.WHEAT);
+            setGrid(1, Items.WHEAT);
+            setGrid(2, Items.WHEAT);
+        });
+        then(10, () -> onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            if (p.containerMenu instanceof TerminalMenu menu) {
+                menu.slots.get(menu.resultSlot + 1).set(new ItemStack(ModContent.item("blank_pattern")));
+                menu.broadcastChanges();
+            }
+        }));
+        then(20, () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.gameMode.handleInventoryButtonClick(minecraft.player.containerMenu.containerId, TerminalMenu.BTN_ENCODE);
+        });
+        then(30, () -> onServer(server -> {
+            ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+            if (p.containerMenu instanceof TerminalMenu menu) {
+                LOGGER.info("BARELYSTORAGE-SHOTS clicks pattern after encode: blank slot holds {}, next slot holds {} {}", menu.slots.get(menu.resultSlot + 1).getItem().getItem().getDescriptionId(),
+                        menu.slots.get(menu.resultSlot + 2).getItem().getItem().getDescriptionId(), menu.slots.get(menu.resultSlot + 2).getItem().getTooltipLines(net.minecraft.world.item.Item.TooltipContext.EMPTY, null, net.minecraft.world.item.TooltipFlag.NORMAL).size());
+            }
+        }));
+        shoot("clicks_pattern_after_encode", 2);
         then(2, () -> close());
         then(20, () -> {
             Minecraft minecraft = Minecraft.getInstance();
