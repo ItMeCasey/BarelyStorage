@@ -1,6 +1,6 @@
 # Project Status
 <!-- status-format: 1 -->
-Updated: 2026-11-09
+Updated: 2026-11-10
 Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
 Spend: none
 
@@ -45,5 +45,5 @@ Spend: none
 - [x] CI build.yml, release.yml, publish script, issue templates (green builds, dry run and release run) (w:3)
 - [x] First release v2026.11.1: GitHub prerelease and three CurseForge betas (project 1786861, file ids 9472566-9472568) (w:2)
 - [x] CurseForge approval: project and the three 2026.11.1 files are public (checked 2026-11-06) (w:1)
-- [ ] Release 2026.11.3 (search sync priority fix; versions bumped, PM tags it) (w:1)
+- [x] Release v2026.11.3: search sync priority fix, tagged and released (w:1)
 - [x] Release v2026.11.2: GitHub pre-release (see-through block fix, Efficiency cards, JEI fix, BEI/REI/Jade, new icons and fonts, BEI storage source) (w:2)
