@@ -61,6 +61,7 @@ public final class ShotTour {
     private static final boolean REI = "rei".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean STACK = "stack".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final boolean CLICKS = "clicks".equals(System.getenv("BARELYSTORAGE_SHOTS"));
+    private static final boolean BSOURCE = "bsource".equals(System.getenv("BARELYSTORAGE_SHOTS"));
     private static final String WORLD = "barelystorage_shots";
     private static int refillTimer;
 
@@ -228,6 +229,22 @@ public final class ShotTour {
             a.patterns.setItem(5, encoded(Pattern.Kind.CRAFTING, new ItemStack(Items.BARREL), new ItemStack(Items.OAK_PLANKS, 6), new ItemStack(Items.OAK_SLAB, 2)));
             LOGGER.info("BARELYSTORAGE-SHOTS stocked: {} items types", net.pool().view().size());
         }));
+        if (BSOURCE) {
+            then(30, () -> moveTo(new Vec3(2.5, y + 1.0, -2.0), new Vec3(2.5, y + 0.5, 0.5)));
+            then(5, () -> LOGGER.info("BARELYSTORAGE-SHOTS bsource with no terminal open: {}", beiTotals()));
+            then(10, () -> open(new BlockPos(2, y, 0)));
+            then(50, () -> LOGGER.info("BARELYSTORAGE-SHOTS bsource with the terminal open: {}", beiTotals()));
+            then(2, () -> close());
+            then(10, () -> LOGGER.info("BARELYSTORAGE-SHOTS bsource after closing: {}", beiTotals()));
+            then(20, () -> {
+                Minecraft minecraft = Minecraft.getInstance();
+                minecraft.options.pauseOnLostFocus = pauseOnLostFocus;
+                LOGGER.info("BARELYSTORAGE-SHOTS DONE");
+                stage = Stage.DONE;
+                minecraft.stop();
+            });
+            return;
+        }
         if (CLICKS) {
             clickSteps(y);
             return;
@@ -350,6 +367,16 @@ public final class ShotTour {
             stage = Stage.DONE;
             minecraft.stop();
         });
+    }
+
+    private static String beiTotals() {
+        try {
+            var m = Class.forName("com.itmecasey.bei.project.InventoryScanner").getMethod("snapshot", net.minecraft.world.entity.player.Player.class);
+            java.util.Map<?, ?> totals = (java.util.Map<?, ?>) m.invoke(null, Minecraft.getInstance().player);
+            return "cobblestone=" + totals.get(Items.COBBLESTONE) + " iron_ingot=" + totals.get(Items.IRON_INGOT) + " items=" + totals.size();
+        } catch (ReflectiveOperationException e) {
+            return "failed " + e;
+        }
     }
 
     /** A click as the real client sends it: through the game mode, so the packet goes to the server. */

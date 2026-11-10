@@ -32,7 +32,7 @@ public class StorageBeiPlugin implements IBeiPlugin {
 
     @Override
     public void registerSearch(ISearchAccess search) {
-        com.itmecasey.barelystorage.client.SearchSync.register(search::getText, search::setText);
+        com.itmecasey.barelystorage.client.SearchSync.register(com.itmecasey.barelystorage.client.SearchSync.BEI, search::getText, search::setText);
     }
 
     @Override

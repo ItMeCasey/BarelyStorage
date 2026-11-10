@@ -41,14 +41,14 @@ public class StorageJeiPlugin implements IModPlugin {
     @Override
     public void onRuntimeAvailable(mezz.jei.api.runtime.IJeiRuntime runtime) {
         StorageJeiPlugin.runtime = runtime;
-        com.itmecasey.barelystorage.client.SearchSync.register(() -> runtime.getIngredientFilter().getFilterText(),
+        com.itmecasey.barelystorage.client.SearchSync.register(com.itmecasey.barelystorage.client.SearchSync.JEI, () -> runtime.getIngredientFilter().getFilterText(),
                 text -> runtime.getIngredientFilter().setFilterText(text));
     }
 
     @Override
     public void onRuntimeUnavailable() {
         runtime = null;
-        com.itmecasey.barelystorage.client.SearchSync.register(null, null);
+        com.itmecasey.barelystorage.client.SearchSync.register(com.itmecasey.barelystorage.client.SearchSync.JEI, null, null);
     }
 
     @Override

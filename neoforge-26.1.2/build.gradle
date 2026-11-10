@@ -138,6 +138,11 @@ dependencies {
     compileOnly "curse.maven:${viewerFiles.cloth}"
     compileOnly 'curse.maven:jade-324717:9156414'
 }
+if (project.hasProperty('beiJar')) {
+    dependencies {
+        runtimeOnly files(project.property('beiJar'))
+    }
+}
 if (project.hasProperty('viewers')) {
     dependencies {
         project.property('viewers').split(',').each { name -> runtimeOnly "curse.maven:${viewerFiles[name.trim()]}" }

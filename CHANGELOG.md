@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 2026.11.3
 
-- No mod changes since 2026.11.2: only tests, development tours and documentation. The take, craft and encode clicks of the terminals were run through a real client on NeoForge 26.2, and the JEI plus handler also on NeoForge 26.1.2 and 26.3.
+- Fixed: with BEI 2026.11.8 or newer, which also runs JEI plugins, the terminal's search sync could follow BEI's JEI bridge instead of BEI's own search box. BEI now wins over REI and JEI when several are installed.
+- Checked in a real client since 2026.11.2: take, craft and encode clicks (NeoForge 26.2), the plus buttons of JEI (NeoForge 26.1.2, 26.2, 26.3), REI (26.1.2, 26.2, 26.3) and BEI (NeoForge 26.1.2, 26.2, Forge 26.2), BEI search sync (NeoForge 26.2, Forge 26.2) and the BEI storage source (NeoForge 26.2).
 
 ## 2026.11.2
 

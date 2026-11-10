@@ -113,6 +113,11 @@ repositories {
 }
 
 def viewerFiles = [smwti: 'smwti-1781438:9450870', bei: 'bei-1783910:9451187']
+if (project.hasProperty('beiJar')) {
+    dependencies {
+        runtimeOnly files(project.property('beiJar'))
+    }
+}
 if (project.hasProperty('viewers')) {
     dependencies {
         project.property('viewers').split(',').each { name -> runtimeOnly "curse.maven:${viewerFiles[name.trim()]}" }
