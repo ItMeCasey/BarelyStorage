@@ -1,6 +1,6 @@
 # Project Status
 <!-- status-format: 1 -->
-Updated: 2026-11-10
+Updated: 2026-11-13
 Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
 Spend: none
 
@@ -43,6 +43,7 @@ Spend: none
 - [x] Branding: icon, banners, LISTING.md, curseforge/DESCRIPTION.md (w:3)
 - [x] Docs, README, wiki pages in the site repo (21 pages, deployed and checked live 2026-11-06) (w:3)
 - [x] CI build.yml, release.yml, publish script, issue templates (green builds, dry run and release run) (w:3)
+- [~] CI builds and releases only the modules a change affects (.github/scripts/plan_matrix.py with unit tests; committed locally, not yet run on GitHub) (w:2)
 - [x] First release v2026.11.1: GitHub prerelease and three CurseForge betas (project 1786861, file ids 9472566-9472568) (w:2)
 - [x] CurseForge approval: project and the three 2026.11.1 files are public (checked 2026-11-06) (w:1)
 - [x] Release v2026.11.3: search sync priority fix, tagged and released (w:1)
