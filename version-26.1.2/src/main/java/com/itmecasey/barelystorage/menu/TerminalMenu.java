@@ -601,6 +601,8 @@ public class TerminalMenu extends StorageMenu {
         blankStack.shrink(1);
         blank.setChanged();
         encoded.setItem(0, out);
+        com.itmecasey.barelystorage.ScriptEvents.fire("pattern_encoded", "kind", processing ? "processing" : "crafting",
+                "output", outputs.get(0).key().id(), "outputCount", outputs.get(0).count(), "inputs", inputs.size());
     }
 
     /**
@@ -776,6 +778,7 @@ public class TerminalMenu extends StorageMenu {
             if (key != null && !craftableAt(slot)) {
                 ItemStack out = net.extract(key, Keys.maxStack(key));
                 if (!out.isEmpty()) {
+                    com.itmecasey.barelystorage.ScriptEvents.fire("items_taken", "item", key.id(), "count", out.getCount(), "player", player.getName().getString());
                     moveItemStackTo(out, firstPlayerSlot, slots.size(), true);
                     if (!out.isEmpty()) {
                         net.insert(out);
@@ -790,7 +793,11 @@ public class TerminalMenu extends StorageMenu {
                 carried.shrink(moved);
                 setCarried(carried.isEmpty() ? ItemStack.EMPTY : carried);
             } else if (key != null && !craftableAt(slot) && button == 0) {
-                setCarried(net.extract(key, 1));
+                ItemStack one = net.extract(key, 1);
+                setCarried(one);
+                if (!one.isEmpty()) {
+                    com.itmecasey.barelystorage.ScriptEvents.fire("items_taken", "item", key.id(), "count", one.getCount(), "player", player.getName().getString());
+                }
             }
         }
         dirty = true;
@@ -799,8 +806,10 @@ public class TerminalMenu extends StorageMenu {
     private void request(StorageNetwork net, ItemKey key, int amount, ServerPlayer player) {
         CraftPlan plan = net.requestCraft(key, amount);
         if (!plan.ok()) {
+            com.itmecasey.barelystorage.ScriptEvents.fire("craft_failed", "item", key.id(), "amount", amount, "player", player.getName().getString(), "message", plan.message);
             player.sendSystemMessage(Component.translatable("message.barelystorage.craft_failed", plan.message));
         } else {
+            com.itmecasey.barelystorage.ScriptEvents.fire("craft_queued", "item", key.id(), "amount", amount, "player", player.getName().getString(), "steps", plan.steps.size());
             player.sendSystemMessage(Component.translatable("message.barelystorage.craft_started", amount,
                     Keys.stack(key, 1, net.registries()).getHoverName(), plan.steps.size()));
         }

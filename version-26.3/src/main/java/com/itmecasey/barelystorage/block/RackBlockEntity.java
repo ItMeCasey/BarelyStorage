@@ -171,6 +171,7 @@ public class RackBlockEntity extends BlockEntity {
     }
 
     private int efficiency;
+    private String announcedError = "";
 
     /** Counts the Efficiency cards of the network again (done every second, and by tests). */
     public void refreshEfficiency() {
@@ -198,6 +199,7 @@ public class RackBlockEntity extends BlockEntity {
     private void tick(Level level, BlockPos pos, BlockState state) {
         age++;
         if (age % 20 == 1) {
+            com.itmecasey.barelystorage.script.ScriptHost.touch(level);
             refreshEfficiency();
         }
         int paid = PowerModel.pay(energy, upkeep());
@@ -207,11 +209,21 @@ public class RackBlockEntity extends BlockEntity {
         }
         if (on != online) {
             online = on;
+            com.itmecasey.barelystorage.ScriptEvents.fire(on ? "rack_online" : "rack_offline", "dimension", com.itmecasey.barelystorage.script.ScriptHost.dimension(level),
+                    "x", pos.getX(), "y", pos.getY(), "z", pos.getZ());
             if (state.getValue(RackBlock.ONLINE) != on) {
                 level.setBlock(pos, state.setValue(RackBlock.ONLINE, on), 3);
             }
             if (!on) {
                 addLog("Power lost: rack offline");
+            }
+        }
+        String error = scheduler.lastError();
+        if (!error.equals(announcedError)) {
+            announcedError = error;
+            if (!error.isEmpty()) {
+                com.itmecasey.barelystorage.ScriptEvents.fire("craft_halted", "dimension", com.itmecasey.barelystorage.script.ScriptHost.dimension(level),
+                        "x", pos.getX(), "y", pos.getY(), "z", pos.getZ(), "message", error);
             }
         }
         if (age % 5 == 0 && online) {

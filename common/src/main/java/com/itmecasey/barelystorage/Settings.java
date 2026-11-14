@@ -81,7 +81,17 @@ public final class Settings {
         return VALUES.getOrDefault(key, e.fallback());
     }
 
-    /** Overrides one setting (tests only). */
+    /** Every setting key, sorted. */
+    public static java.util.List<String> keys() {
+        return new java.util.ArrayList<>(new java.util.TreeSet<>(DEFS.keySet()));
+    }
+
+    /** The current value of a setting as text. */
+    public static String value(String key) {
+        return raw(key);
+    }
+
+    /** Overrides one setting (tests and scripts; not saved to the file). */
     public static synchronized void set(String key, Object value) {
         raw(key);
         VALUES.put(key, String.valueOf(value));

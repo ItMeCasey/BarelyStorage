@@ -70,6 +70,7 @@ public final class SelfTest {
             terminalClicks(new BlockPos(x, y + 18, z));
             efficiency(new BlockPos(x, y + 24, z));
             occlusion();
+            scriptApi(new BlockPos(x, y + 30, z));
         } catch (RuntimeException e) {
             LOGGER.error("SELFTEST error", e);
             verdict("selftest_ran_clean", false, e.toString());
@@ -307,6 +308,41 @@ public final class SelfTest {
         }
         verdict("taken_items_are_gone_from_the_cartridge_item_and_the_list", inItem == afterClick && shownNow == afterClick,
                 "item=" + inItem + " pool=" + afterClick + " listShows=" + shownNow);
+        clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+    }
+
+    private static void scriptApi(BlockPos p) {
+        clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+        com.itmecasey.barelystorage.ScriptEvents.clear();
+        var api = new com.itmecasey.barelystorage.script.StorageApi();
+        java.util.List<String> events = new java.util.ArrayList<>();
+        api.on("rack_online", e -> events.add(e.type() + " " + e.string("dimension") + " " + (int) e.number("y")));
+        api.on("items_taken", e -> events.add("taken"));
+        RackBlockEntity r = rack(p);
+        r.drives.setItem(0, cart("cartridge_gold"));
+        r.setEnergy(r.maxEnergy());
+        tick(r);
+        net(p).insert(new ItemStack(Items.COBBLESTONE, 40));
+        String dim = com.itmecasey.barelystorage.script.ScriptHost.dimension(level);
+        var view = api.network(dim, p.getX(), p.getY(), p.getZ());
+        verdict("script_api_reads_the_network", view != null && view.online() && view.racks() == 1 && view.count("minecraft:cobblestone") == 40 && view.itemTypes() == 1,
+                "dimension=" + dim + " view=" + (view == null ? "null" : view.count("minecraft:cobblestone") + " items, " + view.racks() + " racks"));
+        verdict("script_api_rack_online_event_reaches_the_listener", events.size() == 1 && events.get(0).startsWith("rack_online minecraft:"), events.toString());
+        api.addInsertFilter(id -> !id.equals("minecraft:dirt"));
+        ItemStack left = net(p).insert(new ItemStack(Items.DIRT, 5));
+        ItemStack kept = net(p).insert(new ItemStack(Items.STONE, 5));
+        verdict("script_api_insert_filter_refuses_only_the_filtered_item", left.getCount() == 5 && kept.isEmpty(), "dirt left " + left.getCount() + ", stone left " + kept.getCount());
+        api.setSetting("power.buffer", "12345");
+        verdict("script_api_settings_can_be_read_and_overridden", api.setting("power.buffer").equals("12345") && api.settingKeys().contains("tier.iron.capacity"), api.setting("power.buffer"));
+        com.itmecasey.barelystorage.Settings.set("power.buffer", "400000");
+        boolean modjs = true;
+        try {
+            Class.forName("com.itmecasey.modjs.script.ExtraBindings");
+        } catch (ClassNotFoundException e) {
+            modjs = false;
+        }
+        verdict("script_bridge_is_inactive_only_without_modjs", modjs || !com.itmecasey.barelystorage.script.ScriptBridge.install(), "modjs=" + modjs);
+        com.itmecasey.barelystorage.ScriptEvents.clear();
         clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
     }
 

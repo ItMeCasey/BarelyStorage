@@ -241,6 +241,9 @@ public final class StorageNetwork implements CraftScheduler.Host {
             return stack;
         }
         ItemKey key = Keys.of(stack, registries());
+        if (!com.itmecasey.barelystorage.ScriptEvents.allowInsert(key.id())) {
+            return stack;
+        }
         long in = pool().insert(key, stack.getCount(), false);
         return in >= stack.getCount() ? ItemStack.EMPTY : stack.copyWithCount((int) (stack.getCount() - in));
     }

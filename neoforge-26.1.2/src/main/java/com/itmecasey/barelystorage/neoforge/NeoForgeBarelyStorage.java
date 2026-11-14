@@ -25,6 +25,7 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 public final class NeoForgeBarelyStorage {
     public NeoForgeBarelyStorage(IEventBus modBus) {
         BarelyStorage.init(FMLPaths.CONFIGDIR::get);
+        com.itmecasey.barelystorage.script.ScriptBridge.install();
         modBus.addListener(NeoForgeBarelyStorage::register);
         modBus.addListener(NeoForgeBarelyStorage::capabilities);
         Inventories.loaderFinder = (level, pos, face) -> {

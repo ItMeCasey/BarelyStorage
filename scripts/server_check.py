@@ -9,6 +9,7 @@ server's "Done" line, checks that the log names the mod and has no mod-loading e
 """
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -21,6 +22,7 @@ PORTS = {
     "neoforge-26.3": 8984, "forge-26.3": 8985,
 }
 TIMEOUT = 420
+BASH = os.environ.get("GIT_BASH", "C:/Program Files/Git/bin/bash.exe")
 # Real load problems: the loader could not load a mod, or an error names this mod. Netty and log4j probe lines about native
 # transports on the wrong OS ("Only supported on Linux") are normal noise on Windows and are ignored.
 ERROR_WORDS = re.compile(r"(ModLoadingException|Failed to load mod|Encountered an unexpected exception|FATAL)")
@@ -37,7 +39,15 @@ def check(layer):
         "motd=BarelyStorage server check\nmax-tick-time=-1\n")
     log = []
     env = dict(os.environ, BARELYSTORAGE_SELFTEST="1")
-    proc = subprocess.Popen(["cmd", "/c", str(folder / "gradlew.bat"), "runServer", "--no-daemon", "-q", "-PdevTools"], cwd=folder, env=env,
+    mods = run / "mods"
+    for old in mods.glob("modjs*.jar") if mods.exists() else []:
+        old.unlink()
+    modjs = os.environ.get("BARELYSTORAGE_MODJS_JAR")
+    if modjs:
+        mods.mkdir(exist_ok=True)
+        shutil.copy(modjs, mods / Path(modjs).name)
+    slot = str(Path.home() / ".claude" / "tools" / "gradle-slot.sh").replace("\\", "/")
+    proc = subprocess.Popen([BASH, slot, "./gradlew", "runServer", "--no-daemon", "-q", "-PdevTools"], cwd=folder, env=env,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
 
     def pump():
@@ -59,6 +69,10 @@ def check(layer):
         time.sleep(1)
     time.sleep(2)
     subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)
+    # The server runs as a grandchild of the wrapper; stop whatever still runs from this layer's folder (by pid, never by name).
+    subprocess.run(["powershell", "-NoProfile", "-Command",
+                    "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*" + str(folder).replace("'", "''") + "*' -and $_.ProcessId -ne $PID } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"],
+                   capture_output=True)
     t.join(timeout=5)
     out = "\n".join(log)
     (run / "server_check.log").write_text(out, encoding="utf-8")

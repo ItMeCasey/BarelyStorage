@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ForgeBarelyStorage {
     public ForgeBarelyStorage(FMLJavaModLoadingContext context) {
         BarelyStorage.init(FMLPaths.CONFIGDIR::get);
+        com.itmecasey.barelystorage.script.ScriptBridge.install();
         RegisterEvent.getBus(context.getModBusGroup()).addListener(ForgeBarelyStorage::register);
         AttachCapabilitiesEvent.BlockEntities.BUS.addListener(ForgeBarelyStorage::attach);
         ForgeClient.install(context);

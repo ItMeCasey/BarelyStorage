@@ -1,6 +1,7 @@
 package com.itmecasey.barelystorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedHashMap;
@@ -203,5 +204,44 @@ class StorageTest {
         assertEquals(10, PowerModel.withEfficiency(20, 5));
         assertEquals(10, PowerModel.withEfficiency(20, 12), "the cap is 50 percent");
         assertEquals(1, PowerModel.withEfficiency(1, 5), "a rack always pays at least 1");
+    }
+
+    @Test
+    void scriptEventsReachListenersAndAFailingListenerIsSkipped() {
+        ScriptEvents.clear();
+        java.util.List<String> seen = new java.util.ArrayList<>();
+        ScriptEvents.on("rack_online", e -> {
+            throw new IllegalStateException("script bug");
+        });
+        ScriptEvents.on("rack_online", e -> seen.add(e.string("dimension") + " " + (int) e.number("x")));
+        ScriptEvents.fire("rack_online", "dimension", "minecraft:overworld", "x", 5);
+        assertEquals(java.util.List.of("minecraft:overworld 5"), seen);
+        assertThrows(IllegalArgumentException.class, () -> ScriptEvents.on("nope", e -> { }));
+        ScriptEvents.fire("craft_failed", "item", "x");
+        ScriptEvents.clear();
+    }
+
+    @Test
+    void scriptInsertFiltersRefuseItemsAndBrokenFiltersAreIgnored() {
+        ScriptEvents.clear();
+        assertTrue(ScriptEvents.allowInsert("minecraft:dirt"));
+        ScriptEvents.addInsertFilter(id -> {
+            throw new IllegalStateException("script bug");
+        });
+        ScriptEvents.addInsertFilter(id -> !id.equals("minecraft:dirt"));
+        assertTrue(!ScriptEvents.allowInsert("minecraft:dirt"));
+        assertTrue(ScriptEvents.allowInsert("minecraft:stone"));
+        ScriptEvents.clear();
+    }
+
+    @Test
+    void settingsCanBeListedReadAndOverriddenByScripts() {
+        Settings.reset();
+        assertTrue(Settings.keys().contains("power.buffer"));
+        assertEquals("400000", Settings.value("power.buffer"));
+        Settings.set("power.buffer", "1000");
+        assertEquals("1000", Settings.value("power.buffer"));
+        assertThrows(IllegalArgumentException.class, () -> Settings.value("nope.nope"));
+        Settings.reset();
     }
 }
