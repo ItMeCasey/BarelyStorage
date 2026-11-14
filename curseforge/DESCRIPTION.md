@@ -23,7 +23,7 @@ BarelyStorage is a physical storage network. A Server Rack takes Forge Energy an
 
 # Settings
 
-Power use, drive sizes, hardware, crafting speed and node speed are all in `config/barelystorage.properties`.
+Power use, drive sizes, hardware, crafting speed and node speed are all in `config/barelystorage-common.toml`.
 
 # Compatibility
 

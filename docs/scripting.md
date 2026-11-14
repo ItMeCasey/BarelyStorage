@@ -24,7 +24,7 @@ BarelyStorage adds a global `BarelyStorage` to ModJS server scripts when ModJS i
 ## Rules and settings
 
 - `BarelyStorage.addInsertFilter(fn)`: when `fn(itemId)` returns `false`, no network takes that item.
-- `BarelyStorage.settingKeys()`, `setting(key)` and `setSetting(key, value)` read and change the values of `config/barelystorage.properties` until the game closes (the file is not changed).
+- `BarelyStorage.settingKeys()`, `setting(key)` and `setSetting(key, value)` read and change the values of `config/barelystorage-common.toml` until the game closes or the file is reloaded (the file is not changed).
 
 ## Example
 

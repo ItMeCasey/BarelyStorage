@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.11.5
+
+- Changed: the settings now use the mod loader's standard config files, `config/barelystorage-common.toml` (every number, with comments and ranges) and `config/barelystorage-client.toml` (the terminal's theme, height, sort, order and view). NeoForge also has the in-game config screen. Values reach the game when the file loads or is saved.
+- Migrating: on the first start where a `.toml` does not exist, the values from `config/barelystorage.properties` and `config/barelystorage-client.properties` are copied into it and checked, then each old file is renamed to the same name with `.back` added (with a first line saying where and why it migrated, then the original content; an existing `.back` is never overwritten, the next name is `.back2`). A corrupt or only partly readable old file stays where it is, with no `.back`. Invalid values use the default and out-of-range values are moved into the new range; both are logged.
+
 ## 2026.11.4
 
 - New: optional ModJS scripting. Server scripts get a global `BarelyStorage` with events (rack online and offline, craft queued, failed and halted, pattern encoded, items taken), read access to a network (power, hardware, drives, items), an item insert filter and settings. See docs/scripting.md.
