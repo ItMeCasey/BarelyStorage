@@ -55,7 +55,6 @@ public class PatternItem extends Item {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
         Pattern p = read(stack);
         if (p == null) {
-            out.accept(Component.translatable(type == Type.BLANK ? "tooltip.barelystorage.pattern_blank" : "tooltip.barelystorage.pattern_empty"));
             return;
         }
         for (Pattern.Stack in : p.inputs()) {

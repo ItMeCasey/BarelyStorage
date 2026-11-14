@@ -46,8 +46,4 @@ public class UpgradeItem extends Item {
         return n;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
-        out.accept(Component.translatable("tooltip.barelystorage.upgrade_" + kind.key));
-    }
 }

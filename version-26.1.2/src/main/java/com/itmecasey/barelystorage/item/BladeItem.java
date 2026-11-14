@@ -41,7 +41,6 @@ public class BladeItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
-        out.accept(Component.translatable("tooltip.barelystorage.blade_" + kind.key));
         out.accept(Component.translatable("tooltip.barelystorage.blade_stats", kind.threads(), kind.ram()));
     }
 }
