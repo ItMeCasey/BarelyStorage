@@ -10,7 +10,15 @@ public final class BarelyStorage {
     private BarelyStorage() {
     }
 
+    /**
+     * Runs before the loader reads its config files: on the first start with the new {@code .toml} files, the values of the
+     * old {@code .properties} files are moved over (each old file is kept as {@code .back}).
+     */
     public static void init(Supplier<Path> configDir) {
-        Settings.loadFile(configDir.get().resolve(MODID + ".properties"));
+        Path dir = configDir.get();
+        String version = ConfigMigration.modVersion();
+        java.util.logging.Logger log = java.util.logging.Logger.getLogger("barelystorage");
+        ConfigMigration.seed(dir.resolve(ConfigMigration.COMMON_OLD), dir.resolve(ConfigMigration.COMMON_TOML), Settings.defs(), "BarelyStorage", version, log::info);
+        ConfigMigration.seed(dir.resolve(ConfigMigration.CLIENT_OLD), dir.resolve(ConfigMigration.CLIENT_TOML), ConfigMigration.CLIENT, "BarelyStorage", version, log::info);
     }
 }

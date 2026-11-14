@@ -23,8 +23,9 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 /** NeoForge entry point for Minecraft 26.x. Registers the content, the rack's energy input and the item access for Storage Buses. */
 @Mod(BarelyStorage.MODID)
 public final class NeoForgeBarelyStorage {
-    public NeoForgeBarelyStorage(IEventBus modBus) {
+    public NeoForgeBarelyStorage(IEventBus modBus, net.neoforged.fml.ModContainer container) {
         BarelyStorage.init(FMLPaths.CONFIGDIR::get);
+        NeoForgeConfig.register(container);
         com.itmecasey.barelystorage.script.ScriptBridge.install();
         modBus.addListener(NeoForgeBarelyStorage::register);
         modBus.addListener(NeoForgeBarelyStorage::capabilities);

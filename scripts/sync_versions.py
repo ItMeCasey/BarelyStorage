@@ -44,6 +44,11 @@ def v263(text):
     return text
 
 
+def neo263(text):
+    # NeoForge 26.3 renamed the config types: COMMON is LOCAL (the file keeps its barelystorage-common.toml name).
+    return text.replace("container.registerConfig(ModConfig.Type.COMMON, COMMON);", 'container.registerConfig(ModConfig.Type.LOCAL, COMMON, "barelystorage-common.toml");')
+
+
 def v2612(text):
     text = text.replace("minecraft.gui.overlay()", "minecraft.getOverlay()").replace("minecraft.gui.screen()", "minecraft.screen")
     text = text.replace("registries -> registries.lookupOrThrow(net.minecraft.core.registries.Registries.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).value().createWorldDimensions()",
@@ -73,7 +78,7 @@ def main():
                 s = os.path.join(src, kind, "java")
                 if os.path.isdir(s):
                     d = os.path.join(ROOT, f"{loader}-{v}", "src", kind, "java")
-                    copy_tree(s, d)
+                    copy_tree(s, d, neo263 if (loader, v) == ("neoforge", "26.3") else None)
     print("synced")
 
 

@@ -15,6 +15,7 @@ final class ForgeClient {
     }
 
     static void install(FMLJavaModLoadingContext context) {
+        com.itmecasey.barelystorage.client.ClientSettings.sink = ForgeConfig::storeClient;
         FMLClientSetupEvent.getBus(context.getModBusGroup()).addListener(ForgeClient::setup);
     }
 

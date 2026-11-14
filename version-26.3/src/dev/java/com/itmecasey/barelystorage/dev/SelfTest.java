@@ -61,6 +61,7 @@ public final class SelfTest {
         int z = spawn.getZ() + 3;
         int y = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) + 25;
         try {
+            configFile();
             powerAndStorage(new BlockPos(x, y, z));
             twoRacks(new BlockPos(x, y, z + 6));
             storageBus(new BlockPos(x, y, z + 12));
@@ -344,6 +345,25 @@ public final class SelfTest {
         verdict("script_bridge_is_inactive_only_without_modjs", modjs || !com.itmecasey.barelystorage.script.ScriptBridge.install(), "modjs=" + modjs);
         com.itmecasey.barelystorage.ScriptEvents.clear();
         clear(p.offset(-1, -1, -2), p.offset(4, 1, 2));
+    }
+
+    /** The loader's config file reached the settings: every value in the .toml is the value the game reads. Runs first, then restores the defaults for the other checks. */
+    private static void configFile() {
+        java.nio.file.Path file = java.nio.file.Path.of("config", com.itmecasey.barelystorage.ConfigMigration.COMMON_TOML);
+        try {
+            java.util.Map<String, Integer> toml = com.itmecasey.barelystorage.ConfigMigration.parseToml(java.nio.file.Files.readString(file));
+            StringBuilder bad = new StringBuilder();
+            for (com.itmecasey.barelystorage.Settings.Def d : com.itmecasey.barelystorage.Settings.defs()) {
+                Integer inFile = toml.get(d.key());
+                if (inFile == null || inFile != com.itmecasey.barelystorage.Settings.getInt(d.key())) {
+                    bad.append(' ').append(d.key()).append('=').append(inFile).append('/').append(com.itmecasey.barelystorage.Settings.getInt(d.key()));
+                }
+            }
+            verdict("config_toml_values_are_the_values_the_game_reads", bad.length() == 0 && toml.size() == 32, toml.size() + " values" + bad);
+        } catch (java.io.IOException e) {
+            verdict("config_toml_values_are_the_values_the_game_reads", false, "cannot read " + file.toAbsolutePath() + ": " + e);
+        }
+        com.itmecasey.barelystorage.Settings.reset();
     }
 
     private static void occlusion() {

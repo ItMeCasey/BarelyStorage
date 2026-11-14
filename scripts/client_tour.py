@@ -29,7 +29,7 @@ def tour(layer):
     run = folder / "run"
     run.mkdir(exist_ok=True)
     (run / "options.txt").write_text(OPTIONS)
-    saved = run / "config" / "barelystorage-client.properties"
+    saved = run / "config" / "barelystorage-client.toml"
     if saved.exists():
         saved.unlink()  # the tour clicks through the screen settings, so it starts from the defaults
     shots = run / "screenshots"

@@ -1,70 +1,41 @@
 package com.itmecasey.barelystorage.client;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Properties;
-import net.minecraft.client.Minecraft;
+import java.util.function.Consumer;
 
-/** The player's screen choices (theme, terminal height, sort and view), kept in config/barelystorage-client.properties. */
+/**
+ * The player's screen choices (theme, terminal height, sort, order and view). They live in the loader's client config
+ * ({@code config/barelystorage-client.toml}): the loader pushes the loaded values in through {@link #apply} and gets the new
+ * ones back through {@link #sink} when a button changes one.
+ */
 public final class ClientSettings {
     public static int theme;
     public static int height;
     public static int sort;
     public static int order;
     public static int view;
-    private static boolean loaded;
+    /** Set by the loader: stores {theme, height, sort, order, view} in its config file. */
+    public static Consumer<int[]> sink = values -> {
+    };
 
     private ClientSettings() {
     }
 
-    private static Path file() {
-        return Minecraft.getInstance().gameDirectory.toPath().resolve("config").resolve("barelystorage-client.properties");
+    /** Takes the values of the loaded (or reloaded) client config. */
+    public static void apply(int theme, int height, int sort, int order, int view) {
+        ClientSettings.theme = theme;
+        ClientSettings.height = height;
+        ClientSettings.sort = sort;
+        ClientSettings.order = order;
+        ClientSettings.view = view;
+        Ui.theme(theme == 1);
     }
 
+    /** Called when a screen opens; the values are already in place, this only makes the theme current. */
     public static void load() {
-        if (loaded) {
-            return;
-        }
-        loaded = true;
-        Path f = file();
-        if (Files.exists(f)) {
-            try (Reader r = Files.newBufferedReader(f, StandardCharsets.UTF_8)) {
-                Properties p = new Properties();
-                p.load(r);
-                theme = clamp(p.getProperty("theme"), 1);
-                height = clamp(p.getProperty("height"), 2);
-                sort = clamp(p.getProperty("sort"), 2);
-                order = clamp(p.getProperty("order"), 1);
-                view = clamp(p.getProperty("view"), 2);
-            } catch (IOException | RuntimeException e) {
-                // Broken file: keep the defaults.
-            }
-        }
         Ui.theme(theme == 1);
     }
 
     public static void save() {
-        Path f = file();
-        try {
-            Files.createDirectories(f.getParent());
-            try (Writer w = Files.newBufferedWriter(f, StandardCharsets.UTF_8)) {
-                w.write("# BarelyStorage screen settings, written by the game.\n");
-                w.write("theme=" + theme + "\nheight=" + height + "\nsort=" + sort + "\norder=" + order + "\nview=" + view + "\n");
-            }
-        } catch (IOException e) {
-            // Not being able to save a screen choice is not worth a crash.
-        }
-    }
-
-    private static int clamp(String text, int max) {
-        try {
-            return Math.max(0, Math.min(max, Integer.parseInt(text.trim())));
-        } catch (RuntimeException e) {
-            return 0;
-        }
+        sink.accept(new int[] {theme, height, sort, order, view});
     }
 }
