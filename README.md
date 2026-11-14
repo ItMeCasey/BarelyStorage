@@ -20,6 +20,8 @@ Docs: https://itmecasey.com/wiki/barelystorage/. Listing text: [`curseforge/DESC
 | Upgrade cards | Speed, Capacity, Efficiency (takes 10 percent off every rack's upkeep per card, up to 50 percent) and Filter |
 | CPU and RAM blades | Basic Core, Multi-Threaded RAM Blade and Quantum Core set threads, RAM and chain depth; a job halts with Thread Exhaustion or Out of Memory until you add hardware |
 
+Scripting: with ModJS installed, server scripts get a `BarelyStorage` global; see [docs/scripting.md](docs/scripting.md).
+
 Optional integrations: JEI, REI and BEI plus buttons and search sync, a BEI storage source, Show Me What This Is and Jade (NeoForge) info lines. See the wiki's Compatibility page for what was checked where.
 
 ## Build

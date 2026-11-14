@@ -30,6 +30,7 @@ Power use, drive sizes, hardware, crafting speed and node speed are all in `conf
 - Takes plain Forge Energy through the loader's energy interface, so any cable mod can feed a rack.
 - The plus button of JEI, REI and BEI fills the Crafting Terminal's grid or encodes a pattern in the Pattern Terminal. JEI and REI work on NeoForge only for now.
 - The terminal's search can follow the recipe viewer's search box (JEI, REI and BEI), both ways.
+- ModJS scripts get a BarelyStorage global: events for racks, crafts and patterns, read access to a network, an item insert filter and settings.
 - Optional Show Me What This Is plugin and Jade plugin (NeoForge) for racks, nodes and assemblers.
 - EMI has no build for these Minecraft versions yet.
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.11.4
+
+- New: optional ModJS scripting. Server scripts get a global `BarelyStorage` with events (rack online and offline, craft queued, failed and halted, pattern encoded, items taken), read access to a network (power, hardware, drives, items), an item insert filter and settings. See docs/scripting.md.
+- Removed the hint texts: tooltip lines on upgrade cards, blades and blank or empty patterns, the explanations in the filter and tag labels, the sync button and craftable item tooltips, and the explanation in the offline Import Node line.
+
 ## 2026.11.3
 
 - Fixed: with BEI 2026.11.8 or newer, which also runs JEI plugins, the terminal's search sync could follow BEI's JEI bridge instead of BEI's own search box. BEI now wins over REI and JEI when several are installed.

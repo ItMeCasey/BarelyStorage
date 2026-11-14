@@ -1,14 +1,14 @@
 # Project Status
 <!-- status-format: 1 -->
 Updated: 2026-11-13
-Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge 26.2 only; branding, docs, wiki, CI and release still to do.
+Summary: Server-room storage network (racks, drives, bus cables, nodes with upgrades and filters, terminals, patterns, CPU/RAM-limited crafting) on Forge and NeoForge 26.1.2, 26.2 and 26.3; code, headless self test and unit tests pass on all six layers, client frames checked on NeoForge and Forge 26.2; ModJS scripting added in 2026.11.4, release still to do.
 Spend: none
 
 ## Foundation
 - [x] Layout: shared common/ plus master version-26.2 code synced to 26.1.2 and 26.3, and six loader layers (w:3)
 - [x] Gradle builds compile on Forge and NeoForge for 26.1.2, 26.2 and 26.3 (w:4)
-- [x] 32 unit tests for storage, priority routing, graph, planner (including tag substitutes), scheduler, persistence and power (w:4)
-- [x] Headless server self test, 34 checks, SELFTEST DONE failures=0 on all six layers (w:4)
+- [x] 35 unit tests for storage, priority routing, graph, planner (including tag substitutes), scheduler, persistence and power (w:4)
+- [x] Headless server self test, 39 checks, SELFTEST DONE failures=0, with and without the ModJS jar (w:4)
 - [x] Combined jar per Minecraft version with a dev-tools-out-of-release check (CI dry run and release built three jars, none with dev files) (w:3)
 - [x] GitHub repository ItMeCasey/BarelyStorage with CI, tags v2026.11.1 and v2026.11.2 and pre-releases (w:1)
 
@@ -39,6 +39,10 @@ Spend: none
 - [x] BEI plus button (seen on NeoForge 26.2: enabled in the Pattern Terminal, fills the grid, hidden in the inventory; other layers compile only); BEI storage source for the Master Blueprint (compiles on all six; counts the open terminal list only); search sync with BEI (seen on NeoForge 26.2 both ways), JEI and REI hooked (compile only); EMI (no build for 26.x) and Jade plugin still open (w:3)
 - [x] Item viewers: JEI plus run in a client on NeoForge 26.1.2, 26.2, 26.3; REI plus on NeoForge 26.1.2, 26.2, 26.3; BEI plus on NeoForge 26.1.2, 26.2 and Forge 26.2; BEI search sync (needed a fix, see 2026.11.3) and BEI storage source on NeoForge 26.2, search sync also Forge 26.2. JEI and REI have no Forge 26.x plugin in this mod (their Forge builds do not exist for these versions); BEI on NeoForge 26.3 and Forge 26.1.2/26.3 share the code of the checked builds (w:3)
 
+## Scripting and cleanup
+- [x] ModJS scripting support: BarelyStorage global (events, network read, insert filter, settings), unit tests, headless self test, docs/scripting.md and wiki page (w:3)
+- [x] Hints removed from tooltips, labels and messages (w:2)
+
 ## Docs, branding, release
 - [x] Branding: icon, banners, LISTING.md, curseforge/DESCRIPTION.md (w:3)
 - [x] Docs, README, wiki pages in the site repo (21 pages, deployed and checked live 2026-11-06) (w:3)
@@ -46,5 +50,6 @@ Spend: none
 - [~] CI builds and releases only the modules a change affects (.github/scripts/plan_matrix.py with unit tests; committed locally, not yet run on GitHub) (w:2)
 - [x] First release v2026.11.1: GitHub prerelease and three CurseForge betas (project 1786861, file ids 9472566-9472568) (w:2)
 - [x] CurseForge approval: project and the three 2026.11.1 files are public (checked 2026-11-06) (w:1)
+- [ ] Release 2026.11.4 (scripting, hint removal; PM tags it) (w:1)
 - [x] Release v2026.11.3: search sync priority fix, tagged and released (w:1)
 - [x] Release v2026.11.2: GitHub pre-release (see-through block fix, Efficiency cards, JEI fix, BEI/REI/Jade, new icons and fonts, BEI storage source) (w:2)
